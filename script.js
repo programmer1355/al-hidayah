@@ -3,14 +3,14 @@
 // State Management App Variables
 let appState = {
     currentTab: 'quran',
-    fontSize: 34, // الحجم الافتراضي للقرآن أصبح أكبر وأوضح
+    fontSize: 38, // حجم المصحف الواضح جداً كافتراضي
     misbahaCount: 0,
     misbahaTotal: 0,
     pomodoroTimer: null,
     pomodoroMinutes: 25,
     pomodoroSeconds: 0,
     isPomodoroRunning: false,
-    pomodoroState: 'focus', // focus or break
+    pomodoroState: 'focus',
     latitude: 21.4225, // default Makkah lat
     longitude: 39.8262, // default Makkah long
     qiblaAngle: 0,
@@ -21,6 +21,9 @@ let appState = {
     unlockedBadges: [],
     savedAyahs: [] // قائمة الآيات المحفوظة
 };
+
+// متغير للاحتفاظ ببيانات الآيات الحالية للتحكم بالصوت
+let currentSurahAyahsData = [];
 
 // 1. SYSTEM INITIALIZATION CORES ON WINDOW LOAD
 window.onload = function() {
@@ -33,38 +36,31 @@ window.onload = function() {
     updateHabitTrackerDOM();
     renderBadgesDOM();
     
-    // ربط تغيير الإذاعة بتشغيل الصوت فوراً
+    // ربط تغيير إذاعة الشريط السفلي بتشغيل الصوت فوراً
     document.getElementById('radioSourceSelect').addEventListener('change', (e) => {
         const audioPlayer = document.getElementById('globalRadioAudio');
         audioPlayer.src = e.target.value;
-        audioPlayer.play().catch(() => console.log('Autoplay blocked'));
+        // سيتم التشغيل مباشرة إذا كان المستخدم قد تفاعل مسبقاً
+        audioPlayer.play().catch(() => console.log('Autoplay blocked pending user interaction'));
     });
+    
+    // إعدادات تكرار مشغل القرآن
+    document.getElementById('quranDedicatedAudio').addEventListener('ended', handleQuranAudioEnded);
 };
 
-// 2. TIMERS & DIGITAL CLOCK SYSTEM (تم التحويل إلى توقيت السعودية نظام 12 ساعة مع التاريخين)
+// 2. TIMERS & DIGITAL CLOCK SYSTEM (توقيت السعودية 12 ساعة)
 function initClock() {
     setInterval(() => {
         const now = new Date();
-        
-        // الوقت بنظام 12 ساعة (السعودية)
-        const optionsTime = { 
-            timeZone: 'Asia/Riyadh', 
-            hour: 'numeric', 
-            minute: '2-digit', 
-            second: '2-digit', 
-            hour12: true 
-        };
+        const optionsTime = { timeZone: 'Asia/Riyadh', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
         document.getElementById('digitalClock').innerText = now.toLocaleTimeString('ar-SA', optionsTime);
         
-        // التاريخ الميلادي
         const optionsGregorian = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('currentGregorianDisplay').innerText = now.toLocaleDateString('ar-SA', optionsGregorian);
         
-        // التاريخ الهجري
         const optionsHijri = { year: 'numeric', month: 'long', day: 'numeric' };
         const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', optionsHijri).format(now);
         
-        // إذا لم يكن هناك تحديث من واجهة الأذان، نعتمد التاريخ الهجري الداخلي
         if(!document.getElementById('currentHijriDisplay').dataset.apiUpdated) {
             document.getElementById('currentHijriDisplay').innerText = hijriDate;
         }
@@ -73,20 +69,18 @@ function initClock() {
 
 // 3. CORE TABS SWITCH PANEL LOGIC
 function switchTab(tabId) {
-    // Hide current view
     document.getElementById(`view-${appState.currentTab}`).classList.add('hidden');
-    document.getElementById(`tabBtn-${appState.currentTab}`).className = "w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink";
+    document.getElementById(`tabBtn-${appState.currentTab}`).className = "w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink";
     
-    // Show new view
     document.getElementById(`view-${tabId}`).classList.remove('hidden');
-    document.getElementById(`tabBtn-${tabId}`).className = "w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm bg-emerald-50 text-emerald-700 transition shrink-0 lg:shrink";
+    document.getElementById(`tabBtn-${tabId}`).className = "w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm bg-emerald-50 text-emerald-700 transition shrink-0 lg:shrink shadow-sm border border-emerald-100";
     
     appState.currentTab = tabId;
 }
 
 // 4. ACCESSIBILITY ENGINE & FONTS
 function changeFontSize(delta) {
-    appState.fontSize = Math.max(16, Math.min(60, appState.fontSize + delta));
+    appState.fontSize = Math.max(18, Math.min(60, appState.fontSize + delta));
     document.getElementById('fontSizeDisplay').innerText = appState.fontSize + 'px';
     document.getElementById('surahAyahsContainer').style.fontSize = appState.fontSize + 'px';
 }
@@ -100,7 +94,6 @@ document.getElementById('fontStyleSelect').addEventListener('change', (e) => {
     document.getElementById('surahAyahsContainer').style.fontFamily = e.target.value;
 });
 
-// Dark/Light Theme Handler
 document.getElementById('themeToggleBtn').addEventListener('click', () => {
     document.body.classList.toggle('dark-mode');
     const isDark = document.body.classList.contains('dark-mode');
@@ -121,16 +114,18 @@ function loadSurahListSelectors() {
                 surahSelect.innerHTML += opt;
                 testerSelect.innerHTML += opt;
             });
-            // Pre-select first surah
             surahSelect.value = 1;
             testerSelect.value = 1;
         }).catch(err => console.error("Error fetching surah list", err));
 }
 
-function loadSurahContent() {
+// يتم استدعائها عند تغيير السورة أو للذهاب لآية معينة
+function loadSurahContent(scrollToAyahNumber = null) {
     const surahNum = document.getElementById('quranSurahSelect').value || 1;
     const container = document.getElementById('surahAyahsContainer');
-    container.innerHTML = `<div class="text-center text-sm py-8 text-slate-400"><i class="fas fa-spinner animate-spin"></i> جاري تحميل السورة الكريمة...</div>`;
+    const ayahSelect = document.getElementById('quranAyahSelect');
+    
+    container.innerHTML = `<div class="text-center text-sm py-12 text-slate-400 font-sans"><i class="fas fa-spinner animate-spin text-3xl mb-4"></i><br>جاري تحميل السورة الكريمة...</div>`;
     
     fetch(`https://api.alquran.cloud/v1/surah/${surahNum}`)
         .then(res => res.json())
@@ -138,19 +133,40 @@ function loadSurahContent() {
             document.getElementById('surahTitleDisplay').innerText = `✨ سُورَةُ ${payload.data.name} ✨`;
             container.innerHTML = '';
             
+            // تهيئة قائمة اختيار الآيات للصوت
+            currentSurahAyahsData = payload.data.ayahs;
+            ayahSelect.innerHTML = '<option value="all">تشغيل السورة كاملة</option>';
+            
             payload.data.ayahs.forEach(ayah => {
+                // تعبئة قائمة الآيات
+                ayahSelect.innerHTML += `<option value="${ayah.number}">الآية رقم ${ayah.numberInSurah}</option>`;
+                
+                // رسم الآية في المصحف
                 const ayahSpan = document.createElement('span');
-                // إضافة الكلاسات لتكون الآيات فخمة وواضحة جداً بخط القرآن ومتباعدة بشكل مناسب
-                ayahSpan.className = "ayah-card cursor-pointer hover:bg-emerald-50 rounded px-2 transition text-stone-900 dark:text-stone-100 inline-block font-quran leading-[3.5rem]";
-                ayahSpan.innerHTML = `${ayah.text} <span class="text-emerald-600 font-bold font-sans mx-2 text-xl">﴿${ayah.numberInSurah}﴾</span>`;
-                // فتح نافذة الخيارات عند الضغط
+                ayahSpan.className = "ayah-card font-quran text-stone-800 dark:text-stone-100 inline-block";
+                ayahSpan.id = `ayah-node-${ayah.number}`; // ID للذهاب للآية
+                // استخدام رقم الآية بالزخرفة الإسلامية 
+                ayahSpan.innerHTML = `${ayah.text} <span class="text-emerald-700 font-bold font-sans mx-1.5 text-xl opacity-90">﴿${ayah.numberInSurah}﴾</span>`;
+                
                 ayahSpan.onclick = () => onAyahClick(ayah.number, ayah.text, payload.data.name);
                 container.appendChild(ayahSpan);
             });
             
-            // Auto save bookmark via localStorage
             localStorage.setItem('quranBookmark', JSON.stringify({ number: surahNum, name: payload.data.name }));
             showActiveBookmarkDOM();
+            
+            // إذا كان هناك طلب للذهاب لآية محددة (من قائمة الحفظ)
+            if(scrollToAyahNumber) {
+                setTimeout(() => {
+                    const targetSpan = document.getElementById(`ayah-node-${scrollToAyahNumber}`);
+                    if(targetSpan) {
+                        targetSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        // إضافة تأثير الإضاءة
+                        targetSpan.classList.add('highlight-ayah');
+                        setTimeout(() => targetSpan.classList.remove('highlight-ayah'), 3000);
+                    }
+                }, 500); // مهلة بسيطة لضمان اكتمال الرسم
+            }
         });
 }
 
@@ -162,43 +178,60 @@ function showActiveBookmarkDOM() {
     }
 }
 
-// معالجة تشغيل الصوت لجميع القراء بما فيهم عبدالله القرني
-function playWholeSurahAudio() {
+// -- نظام الصوت الذكي للقرآن (يحل مشكلة التوقف ويجبر على الاختيار) --
+function playQuranAudio() {
     const surahNum = document.getElementById('quranSurahSelect').value;
+    const ayahVal = document.getElementById('quranAyahSelect').value;
     const reciter = document.getElementById('quranReciterSelect').value;
-    const radioStatus = document.getElementById('radioStatusText');
-    const audioPlayer = document.getElementById('globalRadioAudio');
+    const audioPlayer = document.getElementById('quranDedicatedAudio');
     
-    radioStatus.innerText = `جاري تشغيل السورة رقم ${surahNum} بصوت القارئ المختار...`;
-    
-    // بناء الرابط للقارئ عبدالله القرني (استخدام خوادم mp3quran المعتمدة)
-    if (reciter === 'custom_qarni') {
+    // إذا اختار عبدالله القرني، لا يتوفر إلا سورة كاملة حالياً
+    if(reciter === 'custom_qarni') {
+        if(ayahVal !== 'all') {
+            alert('تنبيه: القارئ الشيخ عبدالله القرني متوفر لـ "تشغيل السورة كاملة" فقط في الخادم الحالي. سيتم تشغيل السورة كاملة.');
+            document.getElementById('quranAyahSelect').value = 'all';
+        }
         let formattedSurah = surahNum.toString().padStart(3, '0');
         audioPlayer.src = `https://server6.mp3quran.net/qarni/${formattedSurah}.mp3`;
     } else {
-        audioPlayer.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciter}/${surahNum}.mp3`;
+        // قراء آخرين يدعمون سورة أو آية
+        if (ayahVal === 'all') {
+            // سورة كاملة
+            audioPlayer.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciter}/${surahNum}.mp3`;
+        } else {
+            // آية محددة (ayahVal يحمل الـ global number)
+            audioPlayer.src = `https://cdn.islamic.network/quran/audio/128/${reciter}/${ayahVal}.mp3`;
+        }
     }
     
+    // تشغيل وإظهار خطأ لو منع المتصفح
     audioPlayer.play().catch(err => {
-        alert('يرجى الضغط على زر التشغيل (Play) في المشغل السفلي لبدء الصوت.');
+        alert('يرجى التأكد من الضغط على زر التشغيل بالمشغل الصوتي. سياسة المتصفح تمنع التشغيل التلقائي.');
     });
 }
 
-// معالجة خطأ تحميل الصوت
-function handleAudioError() {
-    const audioPlayer = document.getElementById('globalRadioAudio');
-    if(audioPlayer.src.includes('qarni')) {
-        alert('نعتذر، تلاوة الشيخ عبدالله القرني غير متوفرة حالياً في الخادم لهذه السورة، سيتم التبديل للقارئ عبدالرحمن السديس تلقائياً.');
-        document.getElementById('quranReciterSelect').value = 'ar.abdurrahansudais';
-        playWholeSurahAudio();
+// معالجة التكرار
+function handleQuranAudioEnded() {
+    const repeatMode = document.getElementById('quranRepeatMode').value;
+    const audioPlayer = document.getElementById('quranDedicatedAudio');
+    if (repeatMode === 'repeat') {
+        audioPlayer.currentTime = 0;
+        audioPlayer.play();
     }
 }
 
+
 // --- نظام الآيات المحفوظة ونافذة الخيارات (نسخ، حفظ، تفسير) --- //
-let currentSelectedAyah = { text: '', number: 0, surahName: '' };
+let currentSelectedAyah = { text: '', number: 0, surahName: '', surahNumber: 1 };
 
 function onAyahClick(number, text, surahName) {
-    currentSelectedAyah = { number, text, surahName };
+    const surahNumber = document.getElementById('quranSurahSelect').value;
+    currentSelectedAyah = { number, text, surahName, surahNumber };
+    
+    // اقتطاع الآية للعرض في النافذة
+    const previewText = text.length > 50 ? text.substring(0, 50) + "..." : text;
+    document.getElementById('ayahModalPreviewText').innerText = `﴿ ${previewText} ﴾`;
+    
     toggleAyahActionModal(true);
 }
 
@@ -231,27 +264,57 @@ function actionTafseerAyah() {
     showTafseerModal(currentSelectedAyah.number, currentSelectedAyah.text);
 }
 
+// عرض الآيات المحفوظة وتفعيل الذهاب إليها
 function renderSavedAyahs() {
     const container = document.getElementById('savedAyahsContainer');
     if(!container) return;
     container.innerHTML = '';
     
     if(appState.savedAyahs.length === 0) {
-        container.innerHTML = '<p class="text-sm font-bold text-slate-500 text-center py-4">لا توجد آيات محفوظة بعد في قائمتك.</p>';
+        container.innerHTML = '<p class="text-sm font-bold text-slate-500 text-center py-4 bg-white rounded-xl border">لا توجد آيات محفوظة بعد في قائمتك.</p>';
         return;
     }
     
     appState.savedAyahs.forEach(ayah => {
         const div = document.createElement('div');
-        div.className = "bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-start gap-4 shadow-sm";
+        div.className = "bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center gap-4 shadow-sm hover:border-emerald-300 transition cursor-pointer";
+        
+        // عند الضغط على النص ينتقل للآية
         div.innerHTML = `
-            <div class="flex-1 font-quran text-2xl leading-loose text-stone-800 text-right">
-                ${ayah.text} <span class="text-emerald-600 text-sm font-sans font-bold block mt-1">سورة ${ayah.surahName}</span>
+            <div class="flex-1 font-quran text-2xl md:text-3xl leading-relaxed text-stone-800 text-right truncate" onclick="goToAyah(${ayah.surahNumber}, ${ayah.number})" title="انقر للذهاب إلى الآية">
+                ${ayah.text} <span class="text-emerald-600 text-xs font-sans font-black block mt-2 tracking-wide">سورة ${ayah.surahName}</span>
             </div>
-            <button onclick="removeSavedAyah(${ayah.number})" class="text-red-400 hover:text-red-600 p-2 transition bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
+            <button onclick="removeSavedAyah(${ayah.number}); event.stopPropagation();" class="text-red-400 hover:text-white hover:bg-red-500 p-3 transition bg-red-50 rounded-xl shadow-sm"><i class="fas fa-trash"></i></button>
         `;
         container.appendChild(div);
     });
+}
+
+// دالة الانتقال للآية
+function goToAyah(surahNumber, ayahGlobalNumber) {
+    // إغلاق قائمة الحفظ
+    document.getElementById('savedAyahsContainer').classList.add('hidden');
+    // تبديل النافذة إلى القرآن إذا كان في مكان آخر
+    switchTab('quran');
+    
+    const surahSelect = document.getElementById('quranSurahSelect');
+    
+    // إذا كانت السورة الحالية هي المطلوبة
+    if(surahSelect.value == surahNumber) {
+        const targetSpan = document.getElementById(`ayah-node-${ayahGlobalNumber}`);
+        if(targetSpan) {
+            targetSpan.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            targetSpan.classList.add('highlight-ayah');
+            setTimeout(() => targetSpan.classList.remove('highlight-ayah'), 3000);
+        } else {
+             // في حال لم تجدها لأي سبب أعد التحميل
+             loadSurahContent(ayahGlobalNumber);
+        }
+    } else {
+        // تغيير السورة بالسيليكت وتحميلها وتمرير رقم الآية لعمل السكرول
+        surahSelect.value = surahNumber;
+        loadSurahContent(ayahGlobalNumber);
+    }
 }
 
 function removeSavedAyah(number) {
@@ -263,7 +326,7 @@ function removeSavedAyah(number) {
 function showTafseerModal(ayahGlobalNumber, ayahText) {
     toggleTafseerModal(true);
     document.getElementById('tafseerModalAyahText').innerText = ayahText;
-    document.getElementById('tafseerModalContent').innerText = "جاري جلب التفسير الميسر...";
+    document.getElementById('tafseerModalContent').innerHTML = '<i class="fas fa-spinner animate-spin"></i> جاري جلب التفسير...';
     
     fetch(`https://api.alquran.cloud/v1/ayah/${ayahGlobalNumber}/editions/ar.jalalayn`)
         .then(res => res.json())
@@ -286,8 +349,8 @@ function renderAthkarCategories() {
     for (let key in athkarDB) {
         const cat = athkarDB[key];
         const btn = document.createElement('button');
-        btn.className = "p-4 bg-slate-50 border rounded-2xl font-bold text-sm text-slate-700 flex flex-col items-center gap-2 hover:bg-emerald-50 hover:text-emerald-700 transition focus:outline-none";
-        btn.innerHTML = `<i class="fas ${cat.icon} text-lg text-emerald-600"></i> ${cat.title}`;
+        btn.className = "p-5 bg-white border border-slate-200 shadow-sm rounded-2xl font-black text-sm text-slate-700 flex flex-col items-center gap-3 hover:bg-emerald-50 hover:border-emerald-200 hover:text-emerald-800 transition focus:outline-none active:scale-95";
+        btn.innerHTML = `<i class="fas ${cat.icon} text-2xl text-emerald-600"></i> ${cat.title}`;
         btn.onclick = () => renderAthkarItems(key);
         grid.appendChild(btn);
     }
@@ -295,24 +358,24 @@ function renderAthkarCategories() {
 
 function renderAthkarItems(categoryKey) {
     const container = document.getElementById('athkarListContainer');
-    container.innerHTML = `<h3 class="text-xl font-bold text-slate-800 mb-4 border-r-4 border-emerald-600 pr-2">${athkarDB[categoryKey].title}</h3>`;
+    container.innerHTML = `<h3 class="text-xl md:text-2xl font-extrabold text-slate-800 mb-6 border-r-4 border-emerald-600 pr-3">${athkarDB[categoryKey].title}</h3>`;
     
     const items = athkarDB[categoryKey].items;
     if (items.length === 0) {
-        container.innerHTML += `<div class="p-6 text-center text-slate-400">سيتم إضافة المزيد من الأدعية قريباً لهذا القسم.</div>`;
+        container.innerHTML += `<div class="p-6 text-center text-slate-400 font-bold bg-slate-50 rounded-2xl border">سيتم إضافة المزيد من الأدعية قريباً.</div>`;
         return;
     }
 
-    items.forEach((item, index) => {
+    items.forEach((item) => {
         const card = document.createElement('div');
-        card.className = "bg-slate-50 border rounded-2xl p-5 space-y-3 transition relative group";
+        card.className = "bg-white border border-slate-200 rounded-2xl p-5 md:p-8 space-y-4 shadow-sm hover:shadow-md transition";
         card.innerHTML = `
-            <p class="font-amiri text-2xl leading-relaxed text-slate-800 text-right font-bold">${item.text}</p>
-            <div class="text-xs text-slate-400 font-bold">${item.dalil}</div>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-200">
-                <span class="text-xs font-bold text-slate-500">التكرار المطلوب: <b class="text-slate-700">${item.count}</b></span>
-                <button onclick="decrementDhikrCounter(this, ${item.count})" class="bg-emerald-600 text-white font-bold text-sm px-5 py-2 rounded-xl hover:bg-emerald-700 active:scale-95 transition select-none shadow-md">
-                    العداد: <span class="font-mono bg-white/20 px-2 py-0.5 rounded">${item.count}</span>
+            <p class="font-amiri text-2xl md:text-3xl leading-loose text-slate-800 text-right font-bold">${item.text}</p>
+            <div class="text-sm text-slate-500 font-bold bg-slate-50 p-3 rounded-xl border border-slate-100"><i class="fas fa-book-medical ml-1 text-amber-500"></i> ${item.dalil}</div>
+            <div class="flex flex-col md:flex-row justify-between items-center pt-4 mt-2 border-t border-slate-100 gap-4">
+                <span class="text-sm font-black text-slate-500">التكرار المطلوب: <b class="text-emerald-700 text-lg mx-1">${item.count}</b> مرات</span>
+                <button onclick="decrementDhikrCounter(this, ${item.count})" class="w-full md:w-auto bg-emerald-600 text-white font-bold text-base px-8 py-3.5 rounded-xl hover:bg-emerald-700 active:scale-95 transition shadow-md shadow-emerald-600/30 flex justify-center items-center gap-3">
+                    <i class="fas fa-fingerprint text-xl"></i> العداد: <span class="font-mono bg-white/20 px-3 py-1 rounded-lg shadow-inner text-lg">${item.count}</span>
                 </button>
             </div>
         `;
@@ -327,8 +390,8 @@ function decrementDhikrCounter(btn, maxCount) {
         current--;
         counterSpan.innerText = current;
         if (current === 0) {
-            btn.className = "bg-slate-300 text-slate-500 font-bold text-sm px-5 py-2 rounded-xl cursor-default select-none border";
-            btn.innerText = "✓ تم بالكامل";
+            btn.className = "w-full md:w-auto bg-slate-200 text-slate-500 font-bold text-base px-8 py-3.5 rounded-xl cursor-default select-none border border-slate-300 flex justify-center items-center gap-2";
+            btn.innerHTML = "<i class="fas fa-check-circle text-emerald-500 text-xl"></i> تم بالكامل";
             triggerHapticFeedback();
         }
     }
@@ -364,23 +427,18 @@ function fetchPrayerTimesAPI() {
             document.getElementById('time-Maghrib').innerText = timings.Maghrib;
             document.getElementById('time-Isha').innerText = timings.Isha;
             
-            // Set Hijri Date from API for accuracy
             const hijriDisplay = document.getElementById('currentHijriDisplay');
             hijriDisplay.innerText = `${dates.hijri.day} ${dates.hijri.month.ar} ${dates.hijri.year} هـ`;
             hijriDisplay.dataset.apiUpdated = "true";
             
-            // Set Compass Angle
             appState.qiblaAngle = payload.data.meta.qibla || 21.4;
             document.getElementById('quranQiblaAngle').innerText = Math.round(appState.qiblaAngle);
             document.getElementById('compassDisc').style.transform = `rotate(${-appState.qiblaAngle}deg)`;
             
-            calculateNextPrayerCountdown(timings);
+            document.getElementById('nextPrayerCountdown').innerText = "تم عرض مواقيت الصلاة للموقع المحدد بنجاح";
         });
 }
 
-function calculateNextPrayerCountdown(timings) {
-    document.getElementById('nextPrayerCountdown').innerText = "تم حساب وعرض مواقيت الصلاة بنجاح";
-}
 
 // 8. ELECTRONIC MISBAHA ENGINE
 function incrementMisbahaCounter() {
@@ -431,12 +489,12 @@ function updateHabitTrackerDOM() {
         if (appState.habits[key]) checked++;
         
         const card = document.createElement('div');
-        card.className = `p-4 rounded-2xl border flex justify-between items-center cursor-pointer transition ${appState.habits[key] ? 'bg-emerald-50/60 border-emerald-300' : 'bg-slate-50'}`;
+        card.className = `p-5 rounded-2xl border flex justify-between items-center cursor-pointer transition shadow-sm ${appState.habits[key] ? 'bg-emerald-50 border-emerald-300' : 'bg-white hover:bg-slate-50'}`;
         card.onclick = () => toggleHabit(key);
         card.innerHTML = `
-            <span class="text-sm font-bold text-slate-700">${habitTitles[key]}</span>
-            <div class="w-6 h-6 rounded-full border-2 flex items-center justify-center transition ${appState.habits[key] ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300'}">
-                ${appState.habits[key] ? '✓' : ''}
+            <span class="text-sm md:text-base font-black text-slate-700">${habitTitles[key]}</span>
+            <div class="w-8 h-8 rounded-xl border-2 flex items-center justify-center transition ${appState.habits[key] ? 'bg-emerald-600 border-emerald-600 text-white shadow-md' : 'border-slate-300'}">
+                ${appState.habits[key] ? '<i class="fas fa-check"></i>' : ''}
             </div>
         `;
         habitsContainer.appendChild(card);
@@ -454,17 +512,17 @@ function renderBadgesDOM() {
     const badges = [
         { id: 'first_tasbeeh', title: 'المسبّح المبتدئ', desc: 'تجاوز عداد تسبيحك 33 مرة', icon: 'fa-feather' },
         { id: 'habits_3', title: 'المجتهد الصالح', desc: 'إتمام 3 عبادات يومية', icon: 'fa-star' },
-        { id: 'habits_full', title: 'خادم السنن والنور', desc: 'إنجاز جميع عبادات اليوم كاملة', icon: 'fa-crown' }
+        { id: 'habits_full', title: 'خادم السنن والنور', desc: 'إنجاز عبادات اليوم كاملة', icon: 'fa-crown' }
     ];
 
     badges.forEach(badge => {
         const isUnlocked = appState.unlockedBadges.includes(badge.id);
         const card = document.createElement('div');
-        card.className = `p-4 rounded-2xl border text-center transition flex flex-col items-center gap-2 ${isUnlocked ? 'bg-white badge-unlocked' : 'bg-slate-100 opacity-50'}`;
+        card.className = `p-4 rounded-2xl border text-center transition flex flex-col items-center gap-3 shadow-sm ${isUnlocked ? 'bg-white badge-unlocked' : 'bg-slate-50 border-slate-200 opacity-60 grayscale'}`;
         card.innerHTML = `
-            <div class="w-12 h-12 rounded-full ${isUnlocked ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-lg"><i class="fas ${badge.icon}"></i></div>
-            <h4 class="font-bold text-xs text-slate-800">${badge.title}</h4>
-            <p class="text-[10px] text-slate-400 leading-tight font-bold">${badge.desc}</p>
+            <div class="w-14 h-14 rounded-full ${isUnlocked ? 'bg-emerald-100 text-emerald-600 shadow-inner' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-2xl"><i class="fas ${badge.icon}"></i></div>
+            <h4 class="font-black text-xs md:text-sm text-slate-800">${badge.title}</h4>
+            <p class="text-[11px] text-slate-500 leading-tight font-bold">${badge.desc}</p>
         `;
         container.appendChild(card);
     });
@@ -490,10 +548,10 @@ function togglePomodoroTimer() {
     if (appState.isPomodoroRunning) {
         clearInterval(appState.pomodoroTimer);
         appState.isPomodoroRunning = false;
-        btn.innerHTML = `<i class="fas fa-play ml-1"></i> استئناف المؤقت`;
+        btn.innerHTML = `<i class="fas fa-play ml-2"></i> استئناف المؤقت`;
     } else {
         appState.isPomodoroRunning = true;
-        btn.innerHTML = `<i class="fas fa-pause ml-1"></i> إيقاف مؤقت`;
+        btn.innerHTML = `<i class="fas fa-pause ml-2"></i> إيقاف مؤقت`;
         appState.pomodoroTimer = setInterval(runPomodoroCountdown, 1000);
     }
 }
@@ -536,7 +594,7 @@ function resetPomodoroTimer() {
     appState.pomodoroState = 'focus';
     appState.pomodoroMinutes = 25;
     appState.pomodoroSeconds = 0;
-    document.getElementById('pomoStartBtn').innerHTML = `<i class="fas fa-play ml-1"></i> بدء المؤقت`;
+    document.getElementById('pomoStartBtn').innerHTML = `<i class="fas fa-play ml-2"></i> بدء المؤقت`;
     document.getElementById('pomoStateText').innerText = "وقت التركيز والإنتاجية";
     updatePomodoroDOM();
 }
@@ -546,7 +604,7 @@ function startMemorizationTest() {
     const surahNum = document.getElementById('testerSurahSelect').value;
     const workspace = document.getElementById('testerWorkspace');
     workspace.classList.remove('hidden');
-    workspace.innerHTML = `<i class="fas fa-spinner animate-spin text-slate-400"></i> جاري توليد مراجعة عشوائية...`;
+    workspace.innerHTML = `<div class="text-center w-full font-sans text-lg"><i class="fas fa-spinner animate-spin text-slate-400 mb-3"></i><br>جاري توليد مراجعة عشوائية...</div>`;
     
     fetch(`https://api.alquran.cloud/v1/surah/${surahNum}`)
         .then(res => res.json())
@@ -556,16 +614,16 @@ function startMemorizationTest() {
                 let words = ayah.text.split(' ');
                 let processedWords = words.map(w => {
                     if (Math.random() < 0.3) {
-                        return `<span class="bg-amber-100 px-3 border-b-2 border-amber-400 text-transparent hover:text-slate-800 transition rounded select-none cursor-pointer" title="انقر لعرض الكلمة المخفية">${w}</span>`;
+                        return `<span class="bg-amber-100 px-4 py-1 mx-1 border-b-2 border-amber-400 text-transparent hover:text-slate-800 transition-colors rounded select-none cursor-pointer inline-block" title="انقر لعرض الكلمة المخفية">${w}</span>`;
                     }
                     return w;
                 });
-                workspace.innerHTML += `<p class="mb-3 leading-loose font-quran">${processedWords.join(' ')} <b class="text-emerald-600 font-sans">[${ayah.numberInSurah}]</b></p>`;
+                workspace.innerHTML += `<p class="mb-5 leading-loose font-quran text-4xl">${processedWords.join(' ')} <b class="text-emerald-600 font-sans text-xl opacity-90 mx-2">﴿${ayah.numberInSurah}﴾</b></p>`;
             });
         });
 }
 
-// 12. DATA LOCALSTORAGE PERSIStence
+// 12. DATA LOCALSTORAGE PERSISTENCE
 function saveStateToLocalStorage() {
     localStorage.setItem('islamicPlatformState', JSON.stringify({
         misbahaTotal: appState.misbahaTotal,
@@ -594,8 +652,24 @@ function triggerHapticFeedback() {
     }
 }
 
+// -- التحكم بنافذة بث الحرم وتشغيل/إيقاف الفيديو --
 function toggleMakkahModal(status) {
-    document.getElementById('makkahModal').classList.toggle('hidden', !status);
+    const modal = document.getElementById('makkahModal');
+    modal.classList.toggle('hidden', !status);
+    
+    // تأكد من أن السورس موجود عند فتح النافذة
+    const iframe = document.getElementById('makkahIframe');
+    if (status && !iframe.src.includes('5Mii2-g60p4')) {
+        iframe.src = "https://www.youtube.com/embed/5Mii2-g60p4?rel=0";
+    }
+    // ملاحظة: النافذة عند إغلاقها ستصبح hidden فقط والفيديو يستمر بالعمل بالخلفية كما طلبت.
+}
+
+function stopMakkahStream() {
+    const iframe = document.getElementById('makkahIframe');
+    iframe.src = ""; // حذف المصدر يوقف الصوت تماماً
+    toggleMakkahModal(false); // إغلاق النافذة
+    alert('تم إيقاف بث الحرم المكي بنجاح.');
 }
 
 // Dashboard View Toggle Fullscreen Mode Helper
