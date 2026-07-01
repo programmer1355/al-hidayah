@@ -6,266 +6,301 @@
     <title>منصة ذِكرَى الرقمية | القرآن والأذكار</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;600;700;900&family=Scheherazade+New:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri+Quran&family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-slate-50 text-slate-900 transition-colors duration-300 flex flex-col min-h-screen">
 
-    <nav class="fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-md shadow-sm z-50 flex justify-between items-center px-4 md:px-8 border-b transition-colors duration-300">
+    <nav class="fixed top-0 left-0 right-0 h-16 md:h-20 bg-white/95 backdrop-blur-md shadow-sm z-50 flex justify-between items-center px-4 md:px-8 border-b transition-colors duration-300">
         <div class="flex items-center gap-3">
-            <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-emerald-600/30">🕋</div>
-            <span class="text-2xl font-extrabold text-emerald-700 tracking-wide font-amiri">ذِكـرَى</span>
+            <div class="w-10 h-10 md:w-12 md:h-12 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xl md:text-2xl font-bold shadow-md shadow-emerald-600/30">🕋</div>
+            <span class="text-2xl md:text-3xl font-extrabold text-emerald-700 tracking-wide font-amiri">ذِكـرَى</span>
         </div>
         
-        <div class="flex items-center gap-2">
-            <button id="dashboardModeBtn" class="p-2.5 rounded-xl hover:bg-slate-100 text-slate-600 transition" title="وضع الشاشة الكاملة الذكية">
-                <i class="fas fa-desktop text-lg"></i>
+        <div class="flex items-center gap-1.5 md:gap-3">
+            <button id="dashboardModeBtn" class="p-2 md:p-3 rounded-xl hover:bg-slate-100 text-slate-600 transition" title="وضع الشاشة الكاملة الذكية">
+                <i class="fas fa-desktop text-lg md:text-xl"></i>
             </button>
-            <button id="themeToggleBtn" class="p-2.5 rounded-xl hover:bg-slate-100 text-slate-600 transition">
-                <i class="fas fa-moon text-lg" id="themeIcon"></i>
+            <button id="themeToggleBtn" class="p-2 md:p-3 rounded-xl hover:bg-slate-100 text-slate-600 transition">
+                <i class="fas fa-moon text-lg md:text-xl" id="themeIcon"></i>
             </button>
-            <button id="accessibilityBtn" class="p-2.5 rounded-xl hover:bg-slate-100 text-slate-600 transition" title="تسهيل الاستخدام وحجم الخط">
-                <i class="fas fa-text-height text-lg"></i>
+            <button id="accessibilityBtn" class="p-2 md:p-3 rounded-xl hover:bg-slate-100 text-slate-600 transition" title="تسهيل الاستخدام وحجم الخط">
+                <i class="fas fa-text-height text-lg md:text-xl"></i>
             </button>
         </div>
     </nav>
 
-    <div id="accessibilityPanel" class="fixed top-16 left-4 md:left-8 w-64 bg-white p-4 rounded-2xl shadow-xl border border-slate-100 z-50 hidden transition-all duration-200">
-        <h4 class="font-bold text-sm mb-3 text-slate-700">تسهيل القراءة والاستخدام</h4>
+    <div id="accessibilityPanel" class="fixed top-20 left-4 md:left-8 w-64 bg-white p-5 rounded-2xl shadow-xl border border-slate-100 z-50 hidden transition-all duration-200">
+        <h4 class="font-bold text-sm mb-4 text-slate-700 border-b pb-2">إعدادات القراءة</h4>
         <div class="space-y-4">
             <div>
-                <label class="text-xs text-slate-500 block mb-1">حجم خط القرآن والآيات</label>
+                <label class="text-xs text-slate-500 block mb-2 font-bold">حجم خط القرآن</label>
                 <div class="flex gap-2">
-                    <button onclick="changeFontSize(-2)" class="bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg text-sm font-bold">-</button>
-                    <span id="fontSizeDisplay" class="flex-1 text-center bg-slate-50 py-1 rounded-lg text-sm font-mono">34px</span>
-                    <button onclick="changeFontSize(2)" class="bg-slate-100 hover:bg-slate-200 px-3 py-1 rounded-lg text-sm font-bold">+</button>
+                    <button onclick="changeFontSize(-2)" class="bg-slate-100 hover:bg-slate-200 px-4 py-1.5 rounded-lg text-sm font-bold active:scale-95">-</button>
+                    <span id="fontSizeDisplay" class="flex-1 text-center bg-slate-50 py-1.5 rounded-lg text-sm font-mono font-bold border">38px</span>
+                    <button onclick="changeFontSize(2)" class="bg-slate-100 hover:bg-slate-200 px-4 py-1.5 rounded-lg text-sm font-bold active:scale-95">+</button>
                 </div>
             </div>
             <div>
-                <label class="text-xs text-slate-500 block mb-1">نوع الخط المفضل</label>
-                <select id="fontStyleSelect" class="w-full p-2 border rounded-xl text-sm">
-                    <option value="var(--quran-font)">خط المصحف الواضح (شهرزاد)</option>
-                    <option value="var(--amiri-font)">الخط العثماني (أميري)</option>
-                    <option value="var(--primary-font)">خط النسخ المبسط (كايرو)</option>
+                <label class="text-xs text-slate-500 block mb-2 font-bold">نوع الخط المفضل</label>
+                <select id="fontStyleSelect" class="w-full p-2.5 border rounded-xl text-sm font-bold text-slate-700 bg-slate-50">
+                    <option value="var(--quran-font)">خط المصحف (الرسم العثماني الواضح)</option>
+                    <option value="var(--amiri-font)">خط أميري التقليدي</option>
+                    <option value="var(--primary-font)">خط النسخ (كايرو)</option>
                 </select>
             </div>
         </div>
     </div>
 
-    <div class="fixed bottom-0 left-0 right-0 h-16 bg-emerald-900 text-white z-40 shadow-2xl flex flex-wrap justify-between items-center px-4 md:px-8 border-t border-emerald-800">
-        <div class="flex items-center gap-3">
-            <div class="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
-            <span class="text-xs md:text-sm font-medium" id="radioStatusText">البث الإذاعي المباشر: إذاعة القرآن الكريم</span>
+    <div id="bottomRadioBar" class="fixed bottom-0 left-0 right-0 bg-emerald-900 text-white z-40 shadow-[0_-10px_40px_rgba(0,0,0,0.2)] flex flex-col md:flex-row justify-between items-center px-4 py-3 md:px-8 border-t-4 border-emerald-700 transition-transform duration-300 md:translate-y-[calc(100%-12px)] hover:translate-y-0 group">
+        
+        <div class="absolute -top-6 left-1/2 -translate-x-1/2 bg-emerald-900 text-emerald-300 px-4 py-0.5 rounded-t-xl text-xs hidden md:flex items-center justify-center cursor-pointer shadow-lg">
+            <i class="fas fa-chevron-up group-hover:rotate-180 transition-transform duration-300"></i> <span class="ml-2 font-bold">البث المباشر للإذاعة</span>
         </div>
-        <div class="flex items-center gap-4">
-            <select id="radioSourceSelect" class="bg-emerald-800 text-white text-xs p-2 rounded-lg border border-emerald-700 focus:outline-none">
-                <option value="https://stream.radiojar.com/8s5u8p3p3v8vv">إذاعة القرآن الكريم العامة</option>
+
+        <div class="flex items-center gap-3 mb-3 md:mb-0 w-full md:w-auto justify-center md:justify-start">
+            <div class="w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
+            <span class="text-xs md:text-sm font-bold tracking-wide" id="radioStatusText">البث الإذاعي المباشر: إذاعة القرآن الكريم العامه</span>
+        </div>
+        
+        <div class="flex flex-col md:flex-row items-center gap-3 w-full md:w-auto">
+            <select id="radioSourceSelect" class="bg-emerald-800 text-white text-xs md:text-sm p-2.5 rounded-xl border border-emerald-600 focus:outline-none w-full md:w-auto font-bold text-center">
+                <option value="https://stream.radiojar.com/8s5u8p3p3v8vv">إذاعة القرآن الكريم العامه</option>
                 <option value="https://backup.quraan.us/arabic">إذاعة تلاوات خاشعة 24/7</option>
                 <option value="https://stream.radiojar.com/4wqbww979uvvv">إذاعة تكبيرات العيد والأذكار</option>
             </select>
-            <audio id="globalRadioAudio" controls class="h-9 w-40 md:w-56 text-emerald-900" onerror="handleAudioError()">
+            
+            <audio id="globalRadioAudio" controls class="h-10 w-full md:w-64 text-emerald-900 rounded-lg outline-none">
                 <source src="https://stream.radiojar.com/8s5u8p3p3v8vv" type="audio/mpeg">
             </audio>
-            <button id="makkahLiveBtn" onclick="toggleMakkahModal(true)" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs px-3 py-2 rounded-xl flex items-center gap-1.5 transition">
+            
+            <button id="makkahLiveBtn" onclick="toggleMakkahModal(true)" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm px-5 py-2.5 rounded-xl flex items-center justify-center gap-2 transition w-full md:w-auto shadow-md">
                 <i class="fas fa-video"></i> بث الحرم
             </button>
         </div>
     </div>
 
-    <div id="makkahModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-3xl w-full flex flex-col">
-            <div class="p-4 bg-slate-900 text-white flex justify-between items-center">
-                <span class="font-bold flex items-center gap-2 text-lg"><i class="fas fa-kaaba text-amber-400"></i> بث مباشر من المسجد الحرام - مكة المكرمة</span>
-                <button onclick="toggleMakkahModal(false)" class="text-slate-400 hover:text-white text-2xl">&times;</button>
+    <div id="makkahModal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl overflow-hidden shadow-2xl max-w-4xl w-full flex flex-col">
+            <div class="p-4 md:p-5 bg-slate-900 text-white flex justify-between items-center border-b border-slate-700">
+                <span class="font-bold flex items-center gap-2 text-lg md:text-xl"><i class="fas fa-kaaba text-amber-400"></i> بث مباشر من المسجد الحرام - مكة المكرمة</span>
+                <button onclick="toggleMakkahModal(false)" class="text-slate-400 hover:text-white text-3xl transition">&times;</button>
             </div>
-            <div class="aspect-video bg-black relative">
-                <iframe class="w-full h-full" src="https://www.youtube.com/embed/5Mii2-g60p4?autoplay=1" title="Makkah Live Stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <div class="aspect-video bg-black relative" id="makkahVideoContainer">
+                <iframe id="makkahIframe" class="w-full h-full" src="https://www.youtube.com/embed/5Mii2-g60p4?rel=0" title="Makkah Live Stream" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
-            <div class="p-5 text-center bg-slate-50 flex flex-col gap-3">
-                <p class="text-sm font-bold text-slate-600">هل تواجه مشكلة في مشاهدة البث هنا؟</p>
-                <a href="https://www.youtube.com/live/5Mii2-g60p4?si=EuiCu1OkK5-mH_D-" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl text-sm mx-auto flex items-center gap-2 transition w-fit shadow-md shadow-red-600/30">
-                    <i class="fab fa-youtube text-lg"></i> الانتقال والمشاهدة عبر تطبيق يوتيوب
+            <div class="p-5 md:p-6 bg-slate-50 flex flex-col md:flex-row justify-center items-center gap-4 border-t border-slate-200">
+                <button onclick="stopMakkahStream()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center gap-2 transition shadow-md w-full md:w-auto justify-center">
+                    <i class="fas fa-stop-circle text-red-400"></i> إيقاف البث تماماً
+                </button>
+                <a href="https://www.youtube.com/live/5Mii2-g60p4?si=EuiCu1OkK5-mH_D-" target="_blank" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-xl text-sm flex items-center gap-2 transition w-full md:w-auto justify-center shadow-md shadow-red-600/30">
+                    <i class="fab fa-youtube text-lg"></i> الانتقال لتطبيق يوتيوب
                 </a>
             </div>
         </div>
     </div>
 
-    <div class="pt-24 pb-10 flex-1 flex flex-col lg:flex-row gap-6 px-4 md:px-8 max-w-[1600px] mx-auto w-full">
+    <div class="pt-24 md:pt-28 pb-10 mb-24 md:mb-0 flex-1 flex flex-col lg:flex-row gap-6 px-4 md:px-8 max-w-[1600px] mx-auto w-full">
         
-        <aside class="w-full lg:w-72 shrink-0 flex flex-col gap-4">
+        <aside class="w-full lg:w-80 shrink-0 flex flex-col gap-5">
             
-            <div id="liveTimeHero" class="bg-gradient-to-br from-emerald-700 to-teal-900 text-white p-6 rounded-3xl shadow-xl shadow-emerald-800/10 relative overflow-hidden transition-all duration-500">
-                <div class="absolute -right-6 -bottom-6 text-white/5 text-9xl font-bold font-amiri">✨</div>
-                <div class="relative z-10 space-y-3 text-center">
-                    <div class="text-sm bg-white/10 px-4 py-1.5 rounded-full inline-block backdrop-blur-sm font-bold" id="currentHijriDisplay">... جاري التحميل ...</div>
-                    <h1 class="text-4xl font-black font-mono tracking-wider pt-2" id="digitalClock">00:00:00</h1>
-                    <p class="text-xs text-emerald-200 font-bold pb-2" id="currentGregorianDisplay">...</p>
-                    <div class="h-px bg-white/10 my-2"></div>
-                    <div class="bg-amber-500/20 text-amber-300 font-bold text-sm p-2 rounded-xl" id="nextPrayerCountdown">
+            <div id="liveTimeHero" class="bg-gradient-to-br from-emerald-700 to-teal-900 text-white p-6 md:p-8 rounded-3xl shadow-xl shadow-emerald-800/10 relative overflow-hidden transition-all duration-500 border border-emerald-600">
+                <div class="absolute -right-6 -bottom-6 text-white/5 text-9xl font-bold font-amiri pointer-events-none">✨</div>
+                <div class="relative z-10 space-y-4 text-center">
+                    <div class="text-sm bg-white/10 px-5 py-2 rounded-full inline-block backdrop-blur-sm font-bold border border-white/20" id="currentHijriDisplay">... جاري التحميل ...</div>
+                    <h1 class="text-5xl md:text-6xl font-black font-mono tracking-wider py-2 drop-shadow-md" id="digitalClock">00:00:00</h1>
+                    <p class="text-sm text-emerald-200 font-bold" id="currentGregorianDisplay">...</p>
+                    <div class="h-px bg-white/20 my-3"></div>
+                    <div class="bg-amber-500/20 text-amber-300 font-bold text-sm p-3 rounded-xl border border-amber-500/30 shadow-inner" id="nextPrayerCountdown">
                         الصلاة القادمة: جاري الحساب...
                     </div>
                 </div>
             </div>
 
-            <div class="bg-white p-3 rounded-3xl shadow-sm border space-y-1 flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar">
-                <button onclick="switchTab('quran')" id="tabBtn-quran" class="w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm bg-emerald-50 text-emerald-700 transition shrink-0 lg:shrink">
-                    <span class="w-8 h-8 rounded-xl bg-emerald-600/10 flex items-center justify-center text-base"><i class="fas fa-book-quran"></i></span> المصحف والآيات
+            <div class="bg-white p-3 md:p-4 rounded-3xl shadow-sm border border-slate-200 space-y-1.5 flex flex-row lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar">
+                <button onclick="switchTab('quran')" id="tabBtn-quran" class="w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm bg-emerald-50 text-emerald-700 transition shrink-0 lg:shrink">
+                    <span class="w-10 h-10 rounded-xl bg-emerald-600/10 flex items-center justify-center text-lg shadow-sm"><i class="fas fa-book-quran"></i></span> المصحف والآيات
                 </button>
-                <button onclick="switchTab('athkar')" id="tabBtn-athkar" class="w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
-                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-base"><i class="fas fa-hands-praying"></i></span> حصن المسلم والأذكار
+                <button onclick="switchTab('athkar')" id="tabBtn-athkar" class="w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
+                    <span class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg"><i class="fas fa-hands-praying"></i></span> حصن المسلم والأذكار
                 </button>
-                <button onclick="switchTab('prayer')" id="tabBtn-prayer" class="w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
-                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-base"><i class="fas fa-mosque"></i></span> مواقيت الصلاة والقبلة
+                <button onclick="switchTab('prayer')" id="tabBtn-prayer" class="w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
+                    <span class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg"><i class="fas fa-mosque"></i></span> مواقيت الصلاة والقبلة
                 </button>
-                <button onclick="switchTab('misbaha')" id="tabBtn-misbaha" class="w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
-                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-base"><i class="fas fa-circle-notch"></i></span> السبحة الإلكترونية
+                <button onclick="switchTab('misbaha')" id="tabBtn-misbaha" class="w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
+                    <span class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg"><i class="fas fa-circle-notch"></i></span> السبحة الإلكترونية
                 </button>
-                <button onclick="switchTab('tracker')" id="tabBtn-tracker" class="w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
-                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-base"><i class="fas fa-tasks"></i></span> متابع العبادات
+                <button onclick="switchTab('tracker')" id="tabBtn-tracker" class="w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
+                    <span class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg"><i class="fas fa-tasks"></i></span> متابع العبادات
                 </button>
-                <button onclick="switchTab('pomodoro')" id="tabBtn-pomodoro" class="w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
-                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-base"><i class="fas fa-hourglass-start"></i></span> البومودورو الإسلامي
+                <button onclick="switchTab('pomodoro')" id="tabBtn-pomodoro" class="w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
+                    <span class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg"><i class="fas fa-hourglass-start"></i></span> البومودورو الإسلامي
                 </button>
-                <button onclick="switchTab('tester')" id="tabBtn-tester" class="w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
-                    <span class="w-8 h-8 rounded-xl bg-slate-100 flex items-center justify-center text-base"><i class="fas fa-graduation-cap"></i></span> مراجعة الحفظ
+                <button onclick="switchTab('tester')" id="tabBtn-tester" class="w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink">
+                    <span class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-lg"><i class="fas fa-graduation-cap"></i></span> مراجعة الحفظ
                 </button>
             </div>
         </aside>
 
-        <main class="flex-1 bg-white p-6 md:p-8 rounded-3xl shadow-sm border transition-colors duration-300 min-h-[600px]">
+        <main class="flex-1 bg-white p-4 md:p-8 rounded-3xl shadow-sm border border-slate-200 transition-colors duration-300 min-h-[600px] overflow-hidden">
             
             <div id="view-quran" class="space-y-6">
-                <div class="flex flex-wrap items-center justify-between gap-4 border-b pb-4">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
                     <div>
-                        <h2 class="text-2xl font-extrabold font-amiri text-emerald-800">المصحف المطور وقارئ الآيات</h2>
-                        <p class="text-xs text-slate-500 font-bold mt-1">انقر على أي آية لنسخها، حفظها في قائمتك، أو عرض تفسيرها.</p>
+                        <h2 class="text-2xl md:text-3xl font-extrabold font-amiri text-emerald-800 tracking-wide">المصحف المطور والتلاوة الصوتية</h2>
+                        <p class="text-sm text-slate-500 font-bold mt-2">انقر على أي آية لنسخها، حفظها، أو عرض تفسيرها.</p>
                     </div>
-                    <div id="quranBookmarkDisplay" class="bg-amber-500/10 text-amber-800 text-xs px-3 py-1.5 rounded-xl border border-amber-200 hidden">
+                    <div id="quranBookmarkDisplay" class="bg-amber-500/10 text-amber-800 text-xs px-4 py-2 rounded-xl border border-amber-200 hidden shadow-sm w-full md:w-auto text-center">
                         <i class="fas fa-bookmark text-amber-500 ml-1"></i> آخر قراءة: <span id="bookmarkText" class="font-bold"></span>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4">
-                    <div class="flex justify-between items-center cursor-pointer" onclick="document.getElementById('savedAyahsContainer').classList.toggle('hidden')">
-                        <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-bookmark text-amber-500"></i> الآيات المحفوظة (قائمتي)</h3>
-                        <span class="text-xs font-bold text-slate-400 bg-white px-3 py-1 rounded-lg border">إظهار / إخفاء</span>
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 shadow-sm">
+                    <div class="flex justify-between items-center cursor-pointer select-none" onclick="document.getElementById('savedAyahsContainer').classList.toggle('hidden')">
+                        <h3 class="font-bold text-slate-700 flex items-center gap-2"><i class="fas fa-bookmark text-amber-500 text-lg"></i> الآيات المحفوظة (قائمتي)</h3>
+                        <span class="text-xs font-bold text-slate-500 bg-white px-3 py-1.5 rounded-lg border shadow-sm flex items-center gap-1"><i class="fas fa-sort"></i> إظهار / إخفاء</span>
                     </div>
-                    <div id="savedAyahsContainer" class="hidden mt-4 space-y-3 border-t border-slate-200 pt-4">
+                    <div id="savedAyahsContainer" class="hidden mt-4 space-y-3 border-t border-slate-200 pt-4 max-h-[300px] overflow-y-auto pr-2">
                         </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 block mb-1.5">اختر السورة المباركة</label>
-                        <select id="quranSurahSelect" onchange="loadSurahContent()" class="w-full p-3 rounded-xl border font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 bg-white"></select>
+                <div class="bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100 shadow-inner">
+                    <h3 class="text-sm font-extrabold text-emerald-800 mb-4 flex items-center gap-2"><i class="fas fa-headphones-simple"></i> إعدادات التلاوة الصوتية وتحديد الآيات</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1.5">اختر السورة (إجباري)</label>
+                            <select id="quranSurahSelect" onchange="loadSurahContent()" class="w-full p-3 rounded-xl border-2 border-emerald-200 font-bold text-slate-700 focus:ring-0 focus:border-emerald-500 bg-white shadow-sm transition"></select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1.5">اختر الآية (اختياري)</label>
+                            <select id="quranAyahSelect" class="w-full p-3 rounded-xl border border-slate-200 font-bold text-slate-700 focus:ring-0 focus:border-emerald-500 bg-white shadow-sm transition">
+                                <option value="all">تشغيل السورة كاملة</option>
+                                </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1.5">القارئ</label>
+                            <select id="quranReciterSelect" class="w-full p-3 rounded-xl border border-slate-200 font-bold text-slate-700 focus:ring-0 focus:border-emerald-500 bg-white shadow-sm transition">
+                                <option value="ar.abdurrahansudais">الشيخ عبدالرحمن السديس</option>
+                                <option value="ar.yasseraddussari">الشيخ ياسر الدوسري</option>
+                                <option value="ar.alijaber">الشيخ علي عبدالله جابر</option>
+                                <option value="ar.mahermuaiqly">الشيخ ماهر المعيقلي</option>
+                                <option value="ar.alafasy">الشيخ مشاري العفاسي</option>
+                                <option value="ar.husary">الشيخ محمود خليل الحصري</option>
+                                <option value="custom_qarni">الشيخ عبدالله القرني (سورة كاملة فقط)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-600 block mb-1.5">وضع التكرار</label>
+                            <select id="quranRepeatMode" class="w-full p-3 rounded-xl border border-slate-200 font-bold text-slate-700 focus:ring-0 focus:border-emerald-500 bg-white shadow-sm transition">
+                                <option value="none">بدون تكرار (تلقائي)</option>
+                                <option value="repeat">تكرار المقطع (دائماً)</option>
+                            </select>
+                        </div>
                     </div>
-                    <div>
-                        <label class="text-xs font-bold text-slate-500 block mb-1.5">القارئ المفضل</label>
-                        <select id="quranReciterSelect" class="w-full p-3 rounded-xl border font-bold text-slate-700 focus:ring-2 focus:ring-emerald-500 bg-white">
-                            <option value="custom_qarni">الشيخ عبدالله القرني</option>
-                            <option value="ar.abdurrahansudais">الشيخ عبدالرحمن السديس</option>
-                            <option value="ar.yasseraddussari">الشيخ ياسر الدوسري</option>
-                            <option value="ar.alijaber">الشيخ علي عبدالله جابر</option>
-                            <option value="ar.mahermuaiqly">الشيخ ماهر المعيقلي</option>
-                            <option value="ar.alafasy">الشيخ مشاري العفاسي</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button onclick="playWholeSurahAudio()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-2 transition active:scale-95">
-                            <i class="fas fa-play"></i> تشغيل السورة كاملة صوتياً
+                    
+                    <div class="mt-5 flex flex-col md:flex-row items-center gap-4 bg-white p-3 rounded-xl border border-emerald-100 shadow-sm">
+                        <button onclick="playQuranAudio()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-8 rounded-xl shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2 transition active:scale-95">
+                            <i class="fas fa-play-circle text-xl"></i> تشغيل التلاوة
                         </button>
+                        <audio id="quranDedicatedAudio" controls class="w-full outline-none h-10"></audio>
                     </div>
                 </div>
 
-                <div class="bg-stone-50 border border-stone-200 rounded-3xl p-6 md:p-8 relative min-h-[400px]">
-                    <div class="text-center font-amiri text-2xl text-emerald-800 font-bold mb-8" id="surahTitleDisplay">... بسم الله الرحمن الرحيم ...</div>
-                    <div id="surahAyahsContainer" class="text-right tracking-wide selection:bg-emerald-200" style="font-size: 34px;">
+                <div class="bg-[#fdfaf6] border-2 border-[#e8dcc8] rounded-3xl p-4 md:p-10 relative min-h-[500px] shadow-inner overflow-hidden">
+                    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-8 bg-[#e8dcc8] rounded-b-full opacity-30 pointer-events-none"></div>
+                    
+                    <div class="text-center font-amiri text-3xl md:text-4xl text-emerald-900 font-bold mb-10 mt-4 drop-shadow-sm" id="surahTitleDisplay">... بسم الله الرحمن الرحيم ...</div>
+                    
+                    <div id="surahAyahsContainer" class="text-justify md:text-right tracking-wide selection:bg-emerald-200 scroll-smooth pb-10" style="font-size: 38px;">
                         </div>
                 </div>
             </div>
 
             <div id="view-athkar" class="space-y-6 hidden">
-                <div class="border-b pb-4">
-                    <h2 class="text-2xl font-extrabold font-amiri text-emerald-800">حصن المسلم والأذكار المأثورة بالأدلة والمراجع</h2>
-                    <p class="text-xs text-slate-500 font-bold">مقسمة ومنظمة بشكل يسهل القراءة مع عداد ذكي تفاعلي لكل ذكر.</p>
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-2xl md:text-3xl font-extrabold font-amiri text-emerald-800 tracking-wide">حصن المسلم والأذكار المأثورة</h2>
+                    <p class="text-sm text-slate-500 font-bold mt-2">مقسمة ومنظمة مع عداد ذكي تفاعلي لكل ذكر.</p>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="athkarCategoriesGrid">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4" id="athkarCategoriesGrid">
                     </div>
 
                 <div id="athkarListContainer" class="space-y-4 pt-4">
-                    <div class="text-center text-slate-400 py-12">
-                        <i class="fas fa-hands text-4xl mb-3 text-slate-300"></i>
-                        <p class="font-bold">اختر قسماً من الأعلى لعرض الأذكار والأدعية المرتبة فوراً...</p>
+                    <div class="text-center text-slate-400 py-16 bg-slate-50 rounded-3xl border border-slate-100">
+                        <i class="fas fa-hands text-5xl mb-4 text-slate-300"></i>
+                        <p class="font-bold text-lg">اختر قسماً من الأعلى لعرض الأذكار والأدعية...</p>
                     </div>
                 </div>
             </div>
 
             <div id="view-prayer" class="space-y-6 hidden">
-                <div class="border-b pb-4 flex flex-wrap justify-between items-center gap-4">
+                <div class="border-b border-slate-100 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 class="text-2xl font-extrabold font-amiri text-emerald-800">مواقيت الصلاة الدقيقة والأذان التلقائي</h2>
-                        <p class="text-xs text-slate-500 font-bold">حساب الأوقات بدقة بناءً على موقعك الجغرافي الفعلي مع تنبيه صوتي عند دخول الوقت.</p>
+                        <h2 class="text-2xl md:text-3xl font-extrabold font-amiri text-emerald-800 tracking-wide">مواقيت الصلاة الدقيقة والأذان</h2>
+                        <p class="text-sm text-slate-500 font-bold mt-2">حساب الأوقات بدقة بناءً على موقعك الجغرافي الفعلي.</p>
                     </div>
-                    <button onclick="requestLocationAccess()" class="bg-emerald-100 text-emerald-700 hover:bg-emerald-200 text-xs font-bold px-4 py-2 rounded-xl transition">
+                    <button onclick="requestLocationAccess()" class="bg-emerald-100 text-emerald-800 hover:bg-emerald-200 text-sm font-bold px-5 py-2.5 rounded-xl transition shadow-sm w-full md:w-auto flex items-center justify-center gap-2">
                         <i class="fas fa-location-crosshairs"></i> تحديث الموقع الحالي
                     </button>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-6 gap-4" id="prayerTimesGrid">
-                    <div class="p-4 rounded-2xl border text-center bg-slate-50" id="card-Fajr">
-                        <span class="block text-xs font-bold text-slate-400 mb-1">الفجر</span>
-                        <span class="text-xl font-bold text-slate-700" id="time-Fajr">--:--</span>
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4" id="prayerTimesGrid">
+                    <div class="p-5 rounded-2xl border border-slate-100 text-center bg-white shadow-sm transition hover:shadow-md hover:border-emerald-200" id="card-Fajr">
+                        <span class="block text-sm font-bold text-slate-400 mb-2">الفجر</span>
+                        <span class="text-2xl font-black text-slate-800 font-mono" id="time-Fajr">--:--</span>
                     </div>
-                    <div class="p-4 rounded-2xl border text-center bg-slate-50" id="card-Sunrise">
-                        <span class="block text-xs font-bold text-slate-400 mb-1">الشروق</span>
-                        <span class="text-xl font-bold text-slate-700" id="time-Sunrise">--:--</span>
+                    <div class="p-5 rounded-2xl border border-slate-100 text-center bg-white shadow-sm transition hover:shadow-md hover:border-emerald-200" id="card-Sunrise">
+                        <span class="block text-sm font-bold text-slate-400 mb-2">الشروق</span>
+                        <span class="text-2xl font-black text-slate-800 font-mono" id="time-Sunrise">--:--</span>
                     </div>
-                    <div class="p-4 rounded-2xl border text-center bg-slate-50" id="card-Dhuhr">
-                        <span class="block text-xs font-bold text-slate-400 mb-1">الظهر</span>
-                        <span class="text-xl font-bold text-slate-700" id="time-Dhuhr">--:--</span>
+                    <div class="p-5 rounded-2xl border border-slate-100 text-center bg-white shadow-sm transition hover:shadow-md hover:border-emerald-200" id="card-Dhuhr">
+                        <span class="block text-sm font-bold text-slate-400 mb-2">الظهر</span>
+                        <span class="text-2xl font-black text-slate-800 font-mono" id="time-Dhuhr">--:--</span>
                     </div>
-                    <div class="p-4 rounded-2xl border text-center bg-slate-50" id="card-Asr">
-                        <span class="block text-xs font-bold text-slate-400 mb-1">العصر</span>
-                        <span class="text-xl font-bold text-slate-700" id="time-Asr">--:--</span>
+                    <div class="p-5 rounded-2xl border border-slate-100 text-center bg-white shadow-sm transition hover:shadow-md hover:border-emerald-200" id="card-Asr">
+                        <span class="block text-sm font-bold text-slate-400 mb-2">العصر</span>
+                        <span class="text-2xl font-black text-slate-800 font-mono" id="time-Asr">--:--</span>
                     </div>
-                    <div class="p-4 rounded-2xl border text-center bg-slate-50" id="card-Maghrib">
-                        <span class="block text-xs font-bold text-slate-400 mb-1">المغرب</span>
-                        <span class="text-xl font-bold text-slate-700" id="time-Maghrib">--:--</span>
+                    <div class="p-5 rounded-2xl border border-slate-100 text-center bg-white shadow-sm transition hover:shadow-md hover:border-emerald-200" id="card-Maghrib">
+                        <span class="block text-sm font-bold text-slate-400 mb-2">المغرب</span>
+                        <span class="text-2xl font-black text-slate-800 font-mono" id="time-Maghrib">--:--</span>
                     </div>
-                    <div class="p-4 rounded-2xl border text-center bg-slate-50" id="card-Isha">
-                        <span class="block text-xs font-bold text-slate-400 mb-1">العشاء</span>
-                        <span class="text-xl font-bold text-slate-700" id="time-Isha">--:--</span>
+                    <div class="p-5 rounded-2xl border border-slate-100 text-center bg-white shadow-sm transition hover:shadow-md hover:border-emerald-200" id="card-Isha">
+                        <span class="block text-sm font-bold text-slate-400 mb-2">العشاء</span>
+                        <span class="text-2xl font-black text-slate-800 font-mono" id="time-Isha">--:--</span>
                     </div>
                 </div>
 
-                <div class="bg-slate-50 p-6 rounded-3xl border flex flex-col md:flex-row items-center justify-around gap-6">
-                    <div class="space-y-3 max-w-sm text-center md:text-right">
-                        <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-compass text-emerald-600 ml-1"></i> بوصلة اتجاه القبلة الذكية</h3>
-                        <p class="text-xs text-slate-500 leading-relaxed font-bold">استخدم الجوال الخاص بك لمعاينة اتجاه الكعبة المشرفة الفعلي. تعتمد دقة البوصلة على حساسات جهازك الداعمة للموقع والاتجاه المغناطيسي الجغرافي.</p>
-                        <div class="p-3 bg-white rounded-xl text-xs text-emerald-800 border font-mono inline-block font-bold">
-                            زاوية القبلة: <span id="quranQiblaAngle">--</span>° درجة من الشمال
+                <div class="bg-gradient-to-br from-slate-50 to-white p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-around gap-8 md:gap-10">
+                    <div class="space-y-4 text-center md:text-right max-w-md">
+                        <h3 class="text-xl md:text-2xl font-black text-slate-800 tracking-wide flex justify-center md:justify-start items-center gap-2"><i class="fas fa-compass text-emerald-600"></i> بوصلة القبلة الذكية</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-bold">تعتمد دقة البوصلة على حساسات جهازك الداعمة للموقع والاتجاه المغناطيسي. استخدم الهاتف لمعاينة أفضل.</p>
+                        <div class="p-4 bg-emerald-50 rounded-2xl text-sm text-emerald-900 border border-emerald-100 font-bold inline-block shadow-sm">
+                            زاوية القبلة: <span id="quranQiblaAngle" class="font-mono text-lg text-emerald-600">--</span>° درجة من الشمال
                         </div>
                     </div>
-                    <div class="w-48 h-48 bg-white border-4 border-emerald-600/20 rounded-full flex items-center justify-center relative shadow-lg overflow-hidden" id="compassContainer">
-                        <div class="absolute inset-2 border border-slate-100 rounded-full"></div>
-                        <div class="absolute top-2 text-xs font-bold text-slate-400">N</div>
-                        <div class="w-full h-full absolute flex items-center justify-center transition-transform duration-200" id="compassDisc">
-                            <div class="absolute top-4 text-2xl shadow-xl">🕋</div>
-                            <div class="w-1.5 h-16 bg-red-500 rounded-full origin-bottom -mt-8"></div>
+                    <div class="w-56 h-56 md:w-64 md:h-64 bg-white border-8 border-emerald-50 rounded-full flex items-center justify-center relative shadow-xl overflow-hidden" id="compassContainer">
+                        <div class="absolute inset-3 border-2 border-dashed border-slate-200 rounded-full"></div>
+                        <div class="absolute top-2 text-sm font-black text-slate-400">N</div>
+                        <div class="absolute bottom-2 text-sm font-black text-slate-400">S</div>
+                        <div class="absolute right-3 text-sm font-black text-slate-400">E</div>
+                        <div class="absolute left-3 text-sm font-black text-slate-400">W</div>
+                        <div class="w-full h-full absolute flex items-center justify-center transition-transform duration-300 ease-out" id="compassDisc">
+                            <div class="absolute top-6 text-3xl md:text-4xl drop-shadow-xl z-10">🕋</div>
+                            <div class="w-1.5 h-20 bg-gradient-to-t from-red-500 to-red-400 rounded-full origin-bottom -mt-10 shadow-sm"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div id="view-misbaha" class="space-y-6 hidden">
-                <div class="border-b pb-4">
-                    <h2 class="text-2xl font-extrabold font-amiri text-emerald-800">السبحة الإلكترونية والعداد التفاعلي الذكي</h2>
-                    <p class="text-xs text-slate-500 font-bold">تساعدك على متابعة التسبيح والاستغفار مع اهتزازات ومؤثرات صوتية محفزة عند بلوغ الأرقام الفاضلة.</p>
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-2xl md:text-3xl font-extrabold font-amiri text-emerald-800 tracking-wide">السبحة الإلكترونية التفاعلية</h2>
+                    <p class="text-sm text-slate-500 font-bold mt-2">مؤثرات بصرية وصوتية محفزة عند بلوغ الأرقام الفاضلة.</p>
                 </div>
 
-                <div class="flex flex-col items-center justify-center py-6 gap-6 max-w-md mx-auto bg-slate-50 p-6 rounded-3xl border">
-                    <select id="misbahaPhrases" class="w-full p-3 rounded-xl border bg-white font-bold text-center text-slate-700">
+                <div class="flex flex-col items-center justify-center py-8 md:py-12 gap-8 max-w-lg mx-auto bg-slate-50 p-6 md:p-10 rounded-3xl border border-slate-200 shadow-sm">
+                    <select id="misbahaPhrases" class="w-full p-4 rounded-xl border border-slate-200 bg-white font-bold text-center text-slate-800 text-lg shadow-sm focus:ring-0 focus:border-emerald-500 transition">
                         <option value="سبحان الله">سبحان الله</option>
                         <option value="الحمد لله">الحمد لله</option>
                         <option value="لا إله إلا الله">لا إله إلا الله</option>
@@ -274,58 +309,58 @@
                         <option value="اللهم صلّ وسلم على نبينا محمد">اللهم صلّ وسلم على نبينا محمد</option>
                     </select>
 
-                    <button onclick="incrementMisbahaCounter()" class="w-56 h-56 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-700 text-white font-mono text-5xl font-black flex flex-col items-center justify-center shadow-xl hover:shadow-emerald-600/30 active:scale-95 transition-all duration-100 border-8 border-white select-none focus:outline-none">
-                        <span id="misbahaCountDisplay">0</span>
-                        <span class="text-xs font-sans font-bold text-emerald-200 mt-1 uppercase tracking-widest">اضغط للتسبيح</span>
+                    <button onclick="incrementMisbahaCounter()" class="w-64 h-64 md:w-72 md:h-72 rounded-full bg-gradient-to-tr from-emerald-600 to-teal-700 text-white font-mono text-6xl md:text-7xl font-black flex flex-col items-center justify-center shadow-2xl hover:shadow-emerald-600/40 active:scale-95 active:shadow-inner transition-all duration-150 border-[10px] border-white select-none focus:outline-none">
+                        <span id="misbahaCountDisplay" class="drop-shadow-md">0</span>
+                        <span class="text-sm font-sans font-bold text-emerald-200 mt-2 uppercase tracking-widest opacity-80">اضغط للتسبيح</span>
                     </button>
 
-                    <div class="flex gap-4 w-full">
-                        <button onclick="resetMisbahaCounter()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2 px-4 rounded-xl text-xs transition">
+                    <div class="flex flex-col md:flex-row gap-4 w-full mt-4">
+                        <button onclick="resetMisbahaCounter()" class="flex-1 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-sm flex items-center justify-center gap-2">
                             <i class="fas fa-undo"></i> تصفير العداد
                         </button>
-                        <div class="bg-white px-4 py-2 rounded-xl text-xs border text-slate-500 font-bold flex items-center justify-center">
-                            المجموع الكلي: <span id="misbahaTotalDisplay" class="font-mono text-emerald-700 ml-1 font-bold">0</span>
+                        <div class="bg-white px-6 py-3.5 rounded-xl text-sm border border-slate-200 text-slate-500 font-bold flex items-center justify-center shadow-sm">
+                            المجموع الكلي: <span id="misbahaTotalDisplay" class="font-mono text-emerald-700 ml-2 font-black text-lg">0</span>
                         </div>
                     </div>
                 </div>
             </div>
 
             <div id="view-tracker" class="space-y-6 hidden">
-                <div class="border-b pb-4 flex flex-wrap justify-between items-center gap-4">
+                <div class="border-b border-slate-100 pb-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div>
-                        <h2 class="text-2xl font-extrabold font-amiri text-emerald-800">لوحة العبادات اليومية ونظام الأوسمة المحفز</h2>
-                        <p class="text-xs text-slate-500 font-bold">تتبع صلواتك وأورادك اليومية بشكل تفاعلي، واجمع الأوسمة لحسابك الخاص بالمتصفح.</p>
+                        <h2 class="text-2xl md:text-3xl font-extrabold font-amiri text-emerald-800 tracking-wide">لوحة العبادات ونظام الأوسمة</h2>
+                        <p class="text-sm text-slate-500 font-bold mt-2">تتبع صلواتك وأورادك اليومية واجمع الأوسمة المتميزة.</p>
                     </div>
-                    <div class="bg-emerald-50 text-emerald-700 font-bold px-3 py-1.5 rounded-xl text-xs border border-emerald-100">
-                        نسبة إنجاز اليوم: <span id="habitProgressPct">0%</span>
+                    <div class="bg-emerald-50 text-emerald-800 font-black px-5 py-2.5 rounded-xl text-sm border border-emerald-200 shadow-sm w-full md:w-auto text-center">
+                        نسبة إنجاز اليوم: <span id="habitProgressPct" class="text-emerald-600 ml-1">0%</span>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="habitsChecklistContainer">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4" id="habitsChecklistContainer">
                     </div>
 
-                <div class="pt-4 space-y-3">
-                    <h3 class="text-lg font-bold text-slate-800"><i class="fas fa-medal text-amber-500 ml-1"></i> خزنة الأوسمة والجوائز الإلكترونية</h3>
+                <div class="pt-8 space-y-4">
+                    <h3 class="text-xl font-black text-slate-800 flex items-center gap-2 border-b border-slate-100 pb-2"><i class="fas fa-medal text-amber-500"></i> خزنة الأوسمة والجوائز</h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="badgesContainer">
                         </div>
                 </div>
             </div>
 
             <div id="view-pomodoro" class="space-y-6 hidden">
-                <div class="border-b pb-4">
-                    <h2 class="text-2xl font-extrabold font-amiri text-emerald-800">مؤقت البومودورو الإسلامي للعمل والدراسة</h2>
-                    <p class="text-xs text-slate-500 font-bold">نظم وقت إنتاجيتك (25 دقيقة) وبمجرد انتهاء الوقت يعرض لك مقطعاً دعوياً أو تلاوة خاشعة كاستراحة ذكية.</p>
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-2xl md:text-3xl font-extrabold font-amiri text-emerald-800 tracking-wide">مؤقت البومودورو الإسلامي</h2>
+                    <p class="text-sm text-slate-500 font-bold mt-2">نظم وقت إنتاجيتك واسترح بذكر الله وتلاوته.</p>
                 </div>
 
-                <div class="max-w-md mx-auto text-center bg-slate-50 p-8 rounded-3xl border space-y-6">
-                    <div class="text-xs font-bold tracking-widest text-slate-400 uppercase" id="pomoStateText">وقت التركيز والإنتاجية</div>
-                    <div class="text-6xl font-black font-mono text-emerald-700" id="pomoTimeDisplay">25:00</div>
+                <div class="max-w-md mx-auto text-center bg-gradient-to-b from-slate-50 to-white p-10 rounded-3xl border border-slate-200 shadow-sm space-y-8 mt-8">
+                    <div class="text-sm font-black tracking-widest text-emerald-600 bg-emerald-50 py-2 px-4 rounded-full inline-block border border-emerald-100" id="pomoStateText">وقت التركيز والإنتاجية</div>
+                    <div class="text-7xl md:text-8xl font-black font-mono text-slate-800 drop-shadow-md" id="pomoTimeDisplay">25:00</div>
                     
-                    <div class="flex justify-center gap-3">
-                        <button id="pomoStartBtn" onclick="togglePomodoroTimer()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">
-                            <i class="fas fa-play ml-1"></i> بدء المؤقت
+                    <div class="flex flex-col md:flex-row justify-center gap-3 w-full">
+                        <button id="pomoStartBtn" onclick="togglePomodoroTimer()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3.5 rounded-xl text-sm transition shadow-md flex items-center justify-center gap-2">
+                            <i class="fas fa-play"></i> بدء المؤقت
                         </button>
-                        <button onclick="resetPomodoroTimer()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2.5 rounded-xl text-sm transition">
+                        <button onclick="resetPomodoroTimer()" class="w-full bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-6 py-3.5 rounded-xl text-sm transition shadow-sm">
                             إعادة ضبط
                         </button>
                     </div>
@@ -333,23 +368,23 @@
             </div>
 
             <div id="view-tester" class="space-y-6 hidden">
-                <div class="border-b pb-4">
-                    <h2 class="text-2xl font-extrabold font-amiri text-emerald-800">أداة اختبار ومراجعة الحفظ الذاتية التفاعلية</h2>
-                    <p class="text-xs text-slate-500 font-bold">تقوم الأداة بإخفاء كلمات عشوائية من السورة المختارة لمساعدتك على مراجعة حفظك بطريقة مسلية.</p>
+                <div class="border-b border-slate-100 pb-4">
+                    <h2 class="text-2xl md:text-3xl font-extrabold font-amiri text-emerald-800 tracking-wide">أداة اختبار ومراجعة الحفظ</h2>
+                    <p class="text-sm text-slate-500 font-bold mt-2">اختبر حفظك بإخفاء كلمات عشوائية من السورة.</p>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="flex flex-wrap gap-4 bg-slate-50 p-4 rounded-2xl items-end">
-                        <div class="flex-1 min-w-[200px]">
-                            <label class="text-xs font-bold text-slate-500 block mb-1">السورة المراد اختبار حفظها</label>
-                            <select id="testerSurahSelect" class="w-full p-2.5 border rounded-xl bg-white font-bold text-slate-700"></select>
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row gap-4 bg-slate-50 p-5 rounded-2xl border border-slate-100 shadow-sm items-end">
+                        <div class="flex-1 w-full">
+                            <label class="text-xs font-bold text-slate-500 block mb-2">السورة المراد اختبار حفظها</label>
+                            <select id="testerSurahSelect" class="w-full p-3.5 border border-slate-200 rounded-xl bg-white font-bold text-slate-700 focus:ring-0 focus:border-emerald-500 shadow-sm"></select>
                         </div>
-                        <button onclick="startMemorizationTest()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-xl text-sm transition">
-                            توليد اختبار عشوائي للآيات
+                        <button onclick="startMemorizationTest()" class="w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-8 py-3.5 rounded-xl text-sm transition shadow-md">
+                            توليد اختبار عشوائي
                         </button>
                     </div>
 
-                    <div class="bg-stone-50 border rounded-3xl p-6 min-h-[200px] leading-loose font-amiri text-2xl text-right text-stone-800 hidden" id="testerWorkspace">
+                    <div class="bg-white border-2 border-slate-100 rounded-3xl p-6 md:p-10 min-h-[300px] leading-loose font-quran text-3xl text-right text-stone-800 hidden shadow-inner" id="testerWorkspace">
                         </div>
                 </div>
             </div>
@@ -357,51 +392,56 @@
         </main>
     </div>
 
-    <div id="ayahActionModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full p-6 space-y-4">
-            <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-extrabold text-emerald-800 text-lg">خيارات الآية</span>
-                <button onclick="toggleAyahActionModal(false)" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+    <div id="ayahActionModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-md w-full p-6 md:p-8 space-y-5">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <span class="font-extrabold text-emerald-800 text-xl tracking-wide">خيارات الآية الكريمة</span>
+                <button onclick="toggleAyahActionModal(false)" class="text-slate-400 hover:text-slate-700 text-2xl font-bold transition">&times;</button>
             </div>
+            <div id="ayahModalPreviewText" class="font-quran text-2xl text-center text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100 overflow-hidden text-ellipsis whitespace-nowrap"></div>
+            
             <div class="grid grid-cols-1 gap-3 pt-2">
-                <button onclick="actionCopyAyah()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl flex items-center gap-3 transition border">
-                    <i class="fas fa-copy text-emerald-600 text-xl w-6"></i> نسخ الآية
+                <button onclick="actionCopyAyah()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-4 rounded-xl flex items-center gap-4 transition border border-slate-200 shadow-sm">
+                    <div class="bg-emerald-50 w-10 h-10 flex items-center justify-center rounded-lg"><i class="fas fa-copy text-emerald-600 text-lg"></i></div> 
+                    <span class="text-base">نسخ الآية الكريمة</span>
                 </button>
-                <button onclick="actionSaveAyah()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl flex items-center gap-3 transition border">
-                    <i class="fas fa-bookmark text-amber-500 text-xl w-6"></i> حفظ في قائمتي
+                <button onclick="actionSaveAyah()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-4 rounded-xl flex items-center gap-4 transition border border-slate-200 shadow-sm">
+                    <div class="bg-amber-50 w-10 h-10 flex items-center justify-center rounded-lg"><i class="fas fa-bookmark text-amber-500 text-lg"></i></div> 
+                    <span class="text-base">حفظ في قائمتي</span>
                 </button>
-                <button onclick="actionTafseerAyah()" class="bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold py-3 px-4 rounded-xl flex items-center gap-3 transition border">
-                    <i class="fas fa-book-open text-blue-500 text-xl w-6"></i> عرض التفسير
+                <button onclick="actionTafseerAyah()" class="bg-white hover:bg-slate-50 text-slate-700 font-bold py-3.5 px-4 rounded-xl flex items-center gap-4 transition border border-slate-200 shadow-sm">
+                    <div class="bg-blue-50 w-10 h-10 flex items-center justify-center rounded-lg"><i class="fas fa-book-open text-blue-500 text-lg"></i></div> 
+                    <span class="text-base">قراءة التفسير الميسر</span>
                 </button>
             </div>
         </div>
     </div>
 
-    <div id="tafseerModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full p-6 space-y-4 max-h-[85vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-2">
-                <span class="font-extrabold text-emerald-800 text-lg flex items-center gap-1.5"><i class="fas fa-book-open"></i> تفسير وتدبر الآية الكريمة</span>
-                <button onclick="toggleTafseerModal(false)" class="text-slate-400 hover:text-slate-600 text-xl font-bold">&times;</button>
+    <div id="tafseerModal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-2xl w-full p-6 md:p-8 space-y-5 max-h-[85vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <span class="font-extrabold text-emerald-800 text-xl tracking-wide flex items-center gap-2"><i class="fas fa-book-open text-emerald-600"></i> التفسير والتدبر</span>
+                <button onclick="toggleTafseerModal(false)" class="text-slate-400 hover:text-slate-700 text-2xl font-bold transition">&times;</button>
             </div>
-            <div class="bg-stone-50 p-4 rounded-2xl border text-right font-quran text-2xl text-stone-800 leading-relaxed italic" id="tafseerModalAyahText">
+            <div class="bg-[#fdfaf6] p-5 rounded-2xl border border-[#e8dcc8] text-center font-quran text-3xl md:text-4xl text-stone-800 leading-relaxed shadow-inner" id="tafseerModalAyahText">
                 ... الآية ...
             </div>
-            <div class="space-y-3 mt-4">
-                <h4 class="font-bold text-xs text-slate-400 uppercase tracking-wider">التفسير الميسر</h4>
-                <p class="text-slate-700 text-base font-bold leading-relaxed" id="tafseerModalContent">
+            <div class="space-y-3 pt-4 border-t border-slate-100">
+                <h4 class="font-bold text-sm text-amber-600 flex items-center gap-2"><i class="fas fa-lightbulb"></i> التفسير الميسر</h4>
+                <p class="text-slate-700 text-lg font-bold leading-loose text-justify bg-slate-50 p-5 rounded-xl border border-slate-100" id="tafseerModalContent">
                     جاري تحميل التفسير المعتمد...
                 </p>
             </div>
         </div>
     </div>
 
-    <footer class="mt-auto py-8 bg-white border-t border-slate-200 w-full z-10 relative mb-16 md:mb-0">
-        <div class="max-w-4xl mx-auto text-center space-y-3">
-            <h3 class="text-emerald-700 font-extrabold text-2xl font-amiri tracking-wider">ذِكـرَى</h3>
+    <footer class="mt-auto py-10 bg-white border-t border-slate-200 w-full z-10 relative mb-16 md:mb-0">
+        <div class="max-w-4xl mx-auto text-center space-y-4 px-4">
+            <h3 class="text-emerald-700 font-extrabold text-3xl font-amiri tracking-wide drop-shadow-sm">ذِكـرَى</h3>
             <div class="h-px bg-slate-200 max-w-xs mx-auto"></div>
-            <p class="text-sm font-bold text-slate-600 flex items-center justify-center gap-2">
-                مصنوعة بحب <i class="fas fa-heart text-red-500 animate-pulse"></i> جميع الحقوق محفوظة إلى 
-                <span class="text-emerald-700 bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-200 shadow-sm text-base">عـابـد</span> &copy; 2024
+            <p class="text-sm font-bold text-slate-600 flex items-center justify-center gap-2 flex-wrap">
+                مصنوعة بحب <i class="fas fa-heart text-red-500 animate-pulse text-lg"></i> جميع الحقوق محفوظة إلى 
+                <span class="text-emerald-800 bg-emerald-50 px-5 py-1.5 rounded-full border border-emerald-200 shadow-sm text-base tracking-wide font-black">عـابـد</span> &copy; 2026
             </p>
         </div>
     </footer>
