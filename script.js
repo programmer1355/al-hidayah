@@ -3,7 +3,7 @@
 // State Management App Variables
 let appState = {
     currentTab: 'quran',
-    fontSize: 24,
+    fontSize: 34, // الحجم الافتراضي للقرآن أصبح أكبر وأوضح
     misbahaCount: 0,
     misbahaTotal: 0,
     pomodoroTimer: null,
@@ -18,7 +18,8 @@ let appState = {
         fajr: false, dhuhr: false, asr: false, maghrib: false, isha: false,
         morningAthkar: false, eveningAthkar: false, quranRead: false
     },
-    unlockedBadges: []
+    unlockedBadges: [],
+    savedAyahs: [] // قائمة الآيات المحفوظة
 };
 
 // 1. SYSTEM INITIALIZATION CORES ON WINDOW LOAD
@@ -31,16 +32,42 @@ window.onload = function() {
     loadLocalStorageState();
     updateHabitTrackerDOM();
     renderBadgesDOM();
+    
+    // ربط تغيير الإذاعة بتشغيل الصوت فوراً
+    document.getElementById('radioSourceSelect').addEventListener('change', (e) => {
+        const audioPlayer = document.getElementById('globalRadioAudio');
+        audioPlayer.src = e.target.value;
+        audioPlayer.play().catch(() => console.log('Autoplay blocked'));
+    });
 };
 
-// 2. TIMERS & DIGITAL CLOCK SYSTEM
+// 2. TIMERS & DIGITAL CLOCK SYSTEM (تم التحويل إلى توقيت السعودية نظام 12 ساعة مع التاريخين)
 function initClock() {
     setInterval(() => {
         const now = new Date();
-        document.getElementById('digitalClock').innerText = now.toLocaleTimeString('ar-SA', { hour12: false });
         
-        // Static calculations mockup for Gregorian info
-        document.getElementById('currentGregorianDisplay').innerText = now.toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        // الوقت بنظام 12 ساعة (السعودية)
+        const optionsTime = { 
+            timeZone: 'Asia/Riyadh', 
+            hour: 'numeric', 
+            minute: '2-digit', 
+            second: '2-digit', 
+            hour12: true 
+        };
+        document.getElementById('digitalClock').innerText = now.toLocaleTimeString('ar-SA', optionsTime);
+        
+        // التاريخ الميلادي
+        const optionsGregorian = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentGregorianDisplay').innerText = now.toLocaleDateString('ar-SA', optionsGregorian);
+        
+        // التاريخ الهجري
+        const optionsHijri = { year: 'numeric', month: 'long', day: 'numeric' };
+        const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', optionsHijri).format(now);
+        
+        // إذا لم يكن هناك تحديث من واجهة الأذان، نعتمد التاريخ الهجري الداخلي
+        if(!document.getElementById('currentHijriDisplay').dataset.apiUpdated) {
+            document.getElementById('currentHijriDisplay').innerText = hijriDate;
+        }
     }, 1000);
 }
 
@@ -48,18 +75,18 @@ function initClock() {
 function switchTab(tabId) {
     // Hide current view
     document.getElementById(`view-${appState.currentTab}`).classList.add('hidden');
-    document.getElementById(`tabBtn-${appState.currentTab}`).className = "w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition";
+    document.getElementById(`tabBtn-${appState.currentTab}`).className = "w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition shrink-0 lg:shrink";
     
     // Show new view
     document.getElementById(`view-${tabId}`).classList.remove('hidden');
-    document.getElementById(`tabBtn-${tabId}`).className = "w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm bg-emerald-50 text-emerald-700 transition";
+    document.getElementById(`tabBtn-${tabId}`).className = "w-full text-right px-4 py-3 rounded-2xl flex items-center gap-3 font-bold text-sm bg-emerald-50 text-emerald-700 transition shrink-0 lg:shrink";
     
     appState.currentTab = tabId;
 }
 
 // 4. ACCESSIBILITY ENGINE & FONTS
 function changeFontSize(delta) {
-    appState.fontSize = Math.max(16, Math.min(42, appState.fontSize + delta));
+    appState.fontSize = Math.max(16, Math.min(60, appState.fontSize + delta));
     document.getElementById('fontSizeDisplay').innerText = appState.fontSize + 'px';
     document.getElementById('surahAyahsContainer').style.fontSize = appState.fontSize + 'px';
 }
@@ -113,9 +140,11 @@ function loadSurahContent() {
             
             payload.data.ayahs.forEach(ayah => {
                 const ayahSpan = document.createElement('span');
-                ayahSpan.className = "ayah-card cursor-pointer hover:bg-emerald-50 rounded px-1 transition text-stone-800 dark:text-stone-200 inline-block";
-                ayahSpan.innerHTML = `${ayah.text} <span class="text-emerald-600 font-bold font-sans mx-1 text-base">﴿${ayah.numberInSurah}﴾</span>`;
-                ayahSpan.onclick = () => showTafseerModal(ayah.number, ayah.text);
+                // إضافة الكلاسات لتكون الآيات فخمة وواضحة جداً بخط القرآن ومتباعدة بشكل مناسب
+                ayahSpan.className = "ayah-card cursor-pointer hover:bg-emerald-50 rounded px-2 transition text-stone-900 dark:text-stone-100 inline-block font-quran leading-[3.5rem]";
+                ayahSpan.innerHTML = `${ayah.text} <span class="text-emerald-600 font-bold font-sans mx-2 text-xl">﴿${ayah.numberInSurah}﴾</span>`;
+                // فتح نافذة الخيارات عند الضغط
+                ayahSpan.onclick = () => onAyahClick(ayah.number, ayah.text, payload.data.name);
                 container.appendChild(ayahSpan);
             });
             
@@ -133,7 +162,7 @@ function showActiveBookmarkDOM() {
     }
 }
 
-// Play complete audio for the selected reciter
+// معالجة تشغيل الصوت لجميع القراء بما فيهم عبدالله القرني
 function playWholeSurahAudio() {
     const surahNum = document.getElementById('quranSurahSelect').value;
     const reciter = document.getElementById('quranReciterSelect').value;
@@ -141,8 +170,94 @@ function playWholeSurahAudio() {
     const audioPlayer = document.getElementById('globalRadioAudio');
     
     radioStatus.innerText = `جاري تشغيل السورة رقم ${surahNum} بصوت القارئ المختار...`;
-    audioPlayer.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciter}/${surahNum}.mp3`;
-    audioPlayer.play();
+    
+    // بناء الرابط للقارئ عبدالله القرني (استخدام خوادم mp3quran المعتمدة)
+    if (reciter === 'custom_qarni') {
+        let formattedSurah = surahNum.toString().padStart(3, '0');
+        audioPlayer.src = `https://server6.mp3quran.net/qarni/${formattedSurah}.mp3`;
+    } else {
+        audioPlayer.src = `https://cdn.islamic.network/quran/audio-surah/128/${reciter}/${surahNum}.mp3`;
+    }
+    
+    audioPlayer.play().catch(err => {
+        alert('يرجى الضغط على زر التشغيل (Play) في المشغل السفلي لبدء الصوت.');
+    });
+}
+
+// معالجة خطأ تحميل الصوت
+function handleAudioError() {
+    const audioPlayer = document.getElementById('globalRadioAudio');
+    if(audioPlayer.src.includes('qarni')) {
+        alert('نعتذر، تلاوة الشيخ عبدالله القرني غير متوفرة حالياً في الخادم لهذه السورة، سيتم التبديل للقارئ عبدالرحمن السديس تلقائياً.');
+        document.getElementById('quranReciterSelect').value = 'ar.abdurrahansudais';
+        playWholeSurahAudio();
+    }
+}
+
+// --- نظام الآيات المحفوظة ونافذة الخيارات (نسخ، حفظ، تفسير) --- //
+let currentSelectedAyah = { text: '', number: 0, surahName: '' };
+
+function onAyahClick(number, text, surahName) {
+    currentSelectedAyah = { number, text, surahName };
+    toggleAyahActionModal(true);
+}
+
+function toggleAyahActionModal(status) {
+    document.getElementById('ayahActionModal').classList.toggle('hidden', !status);
+}
+
+function actionCopyAyah() {
+    navigator.clipboard.writeText(currentSelectedAyah.text).then(() => {
+        alert('تم نسخ الآية بنجاح!');
+        toggleAyahActionModal(false);
+    });
+}
+
+function actionSaveAyah() {
+    const isExists = appState.savedAyahs.find(a => a.number === currentSelectedAyah.number);
+    if(!isExists) {
+        appState.savedAyahs.push(currentSelectedAyah);
+        saveStateToLocalStorage();
+        alert('تم الحفظ في قائمتك بنجاح!');
+    } else {
+        alert('هذه الآية محفوظة مسبقاً في قائمتك.');
+    }
+    toggleAyahActionModal(false);
+    renderSavedAyahs();
+}
+
+function actionTafseerAyah() {
+    toggleAyahActionModal(false);
+    showTafseerModal(currentSelectedAyah.number, currentSelectedAyah.text);
+}
+
+function renderSavedAyahs() {
+    const container = document.getElementById('savedAyahsContainer');
+    if(!container) return;
+    container.innerHTML = '';
+    
+    if(appState.savedAyahs.length === 0) {
+        container.innerHTML = '<p class="text-sm font-bold text-slate-500 text-center py-4">لا توجد آيات محفوظة بعد في قائمتك.</p>';
+        return;
+    }
+    
+    appState.savedAyahs.forEach(ayah => {
+        const div = document.createElement('div');
+        div.className = "bg-white p-4 rounded-xl border border-slate-100 flex justify-between items-start gap-4 shadow-sm";
+        div.innerHTML = `
+            <div class="flex-1 font-quran text-2xl leading-loose text-stone-800 text-right">
+                ${ayah.text} <span class="text-emerald-600 text-sm font-sans font-bold block mt-1">سورة ${ayah.surahName}</span>
+            </div>
+            <button onclick="removeSavedAyah(${ayah.number})" class="text-red-400 hover:text-red-600 p-2 transition bg-red-50 rounded-lg"><i class="fas fa-trash"></i></button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function removeSavedAyah(number) {
+    appState.savedAyahs = appState.savedAyahs.filter(a => a.number !== number);
+    saveStateToLocalStorage();
+    renderSavedAyahs();
 }
 
 function showTafseerModal(ayahGlobalNumber, ayahText) {
@@ -192,12 +307,12 @@ function renderAthkarItems(categoryKey) {
         const card = document.createElement('div');
         card.className = "bg-slate-50 border rounded-2xl p-5 space-y-3 transition relative group";
         card.innerHTML = `
-            <p class="font-amiri text-xl leading-relaxed text-slate-800 text-right font-bold">${item.text}</p>
-            <div class="text-xs text-slate-400 font-medium">${item.dalil}</div>
-            <div class="flex justify-between items-center pt-2 border-t border-slate-100">
-                <span class="text-xs text-slate-400">التكرار المطلوب: <b class="text-slate-600">${item.count}</b></span>
-                <button onclick="decrementDhikrCounter(this, ${item.count})" class="bg-emerald-600 text-white font-bold text-xs px-4 py-2 rounded-xl hover:bg-emerald-700 active:scale-95 transition select-none">
-                    عداد: <span class="font-mono bg-white/20 px-1.5 py-0.5 rounded">${item.count}</span>
+            <p class="font-amiri text-2xl leading-relaxed text-slate-800 text-right font-bold">${item.text}</p>
+            <div class="text-xs text-slate-400 font-bold">${item.dalil}</div>
+            <div class="flex justify-between items-center pt-2 border-t border-slate-200">
+                <span class="text-xs font-bold text-slate-500">التكرار المطلوب: <b class="text-slate-700">${item.count}</b></span>
+                <button onclick="decrementDhikrCounter(this, ${item.count})" class="bg-emerald-600 text-white font-bold text-sm px-5 py-2 rounded-xl hover:bg-emerald-700 active:scale-95 transition select-none shadow-md">
+                    العداد: <span class="font-mono bg-white/20 px-2 py-0.5 rounded">${item.count}</span>
                 </button>
             </div>
         `;
@@ -212,7 +327,7 @@ function decrementDhikrCounter(btn, maxCount) {
         current--;
         counterSpan.innerText = current;
         if (current === 0) {
-            btn.className = "bg-slate-300 text-slate-500 font-bold text-xs px-4 py-2 rounded-xl cursor-default select-none";
+            btn.className = "bg-slate-300 text-slate-500 font-bold text-sm px-5 py-2 rounded-xl cursor-default select-none border";
             btn.innerText = "✓ تم بالكامل";
             triggerHapticFeedback();
         }
@@ -227,7 +342,6 @@ function requestLocationAccess() {
             appState.longitude = position.coords.longitude;
             fetchPrayerTimesAPI();
         }, () => {
-            // Fallback to default Makkah coordinates if user denies permission
             fetchPrayerTimesAPI();
         });
     } else {
@@ -243,7 +357,6 @@ function fetchPrayerTimesAPI() {
             const timings = payload.data.timings;
             const dates = payload.data.date;
             
-            // Set values inside cards
             document.getElementById('time-Fajr').innerText = timings.Fajr;
             document.getElementById('time-Sunrise').innerText = timings.Sunrise;
             document.getElementById('time-Dhuhr').innerText = timings.Dhuhr;
@@ -251,8 +364,10 @@ function fetchPrayerTimesAPI() {
             document.getElementById('time-Maghrib').innerText = timings.Maghrib;
             document.getElementById('time-Isha').innerText = timings.Isha;
             
-            // Set Hijri Date
-            document.getElementById('currentHijriDisplay').innerText = `${dates.hijri.day} ${dates.hijri.month.ar} ${dates.hijri.year} هـ`;
+            // Set Hijri Date from API for accuracy
+            const hijriDisplay = document.getElementById('currentHijriDisplay');
+            hijriDisplay.innerText = `${dates.hijri.day} ${dates.hijri.month.ar} ${dates.hijri.year} هـ`;
+            hijriDisplay.dataset.apiUpdated = "true";
             
             // Set Compass Angle
             appState.qiblaAngle = payload.data.meta.qibla || 21.4;
@@ -264,8 +379,7 @@ function fetchPrayerTimesAPI() {
 }
 
 function calculateNextPrayerCountdown(timings) {
-    // Basic countdown calculator mock algorithm
-    document.getElementById('nextPrayerCountdown').innerText = "الصلاة القادمة: صلاة العصر متوفرة";
+    document.getElementById('nextPrayerCountdown').innerText = "تم حساب وعرض مواقيت الصلاة بنجاح";
 }
 
 // 8. ELECTRONIC MISBAHA ENGINE
@@ -275,7 +389,6 @@ function incrementMisbahaCounter() {
     document.getElementById('misbahaCountDisplay').innerText = appState.misbahaCount;
     document.getElementById('misbahaTotalDisplay').innerText = appState.misbahaTotal;
     
-    // Auto feedback targets at 33 or 100
     if (appState.misbahaCount === 33 || appState.misbahaCount === 100) {
         triggerHapticFeedback();
     }
@@ -351,7 +464,7 @@ function renderBadgesDOM() {
         card.innerHTML = `
             <div class="w-12 h-12 rounded-full ${isUnlocked ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-200 text-slate-400'} flex items-center justify-center text-lg"><i class="fas ${badge.icon}"></i></div>
             <h4 class="font-bold text-xs text-slate-800">${badge.title}</h4>
-            <p class="text-[10px] text-slate-400 leading-tight">${badge.desc}</p>
+            <p class="text-[10px] text-slate-400 leading-tight font-bold">${badge.desc}</p>
         `;
         container.appendChild(card);
     });
@@ -388,13 +501,11 @@ function togglePomodoroTimer() {
 function runPomodoroCountdown() {
     if (appState.pomodoroSeconds === 0) {
         if (appState.pomodoroMinutes === 0) {
-            // Timer Finished trigger haptic/audio
             triggerHapticFeedback();
             if (appState.pomodoroState === 'focus') {
                 appState.pomodoroState = 'break';
                 appState.pomodoroMinutes = 5;
                 document.getElementById('pomoStateText').innerText = "وقت الاستراحة والذكر القصير (5 دقائق)";
-                // Play automatic short reminder audio fallback
                 document.getElementById('globalRadioAudio').src = "https://backup.quraan.us/arabic";
                 document.getElementById('globalRadioAudio').play();
             } else {
@@ -402,7 +513,7 @@ function runPomodoroCountdown() {
                 appState.pomodoroMinutes = 25;
                 document.getElementById('pomoStateText').innerText = "وقت التركيز والإنتاجية";
             }
-            togglePomodoroTimer(); // pause
+            togglePomodoroTimer(); 
             return;
         }
         appState.pomodoroMinutes--;
@@ -443,14 +554,13 @@ function startMemorizationTest() {
             workspace.innerHTML = '';
             payload.data.ayahs.slice(0, 5).forEach(ayah => {
                 let words = ayah.text.split(' ');
-                // Hide roughly 30% of words randomly
                 let processedWords = words.map(w => {
                     if (Math.random() < 0.3) {
                         return `<span class="bg-amber-100 px-3 border-b-2 border-amber-400 text-transparent hover:text-slate-800 transition rounded select-none cursor-pointer" title="انقر لعرض الكلمة المخفية">${w}</span>`;
                     }
                     return w;
                 });
-                workspace.innerHTML += `<p class="mb-3">${processedWords.join(' ')} <b class="text-emerald-600 font-sans">[${ayah.numberInSurah}]</b></p>`;
+                workspace.innerHTML += `<p class="mb-3 leading-loose font-quran">${processedWords.join(' ')} <b class="text-emerald-600 font-sans">[${ayah.numberInSurah}]</b></p>`;
             });
         });
 }
@@ -460,7 +570,8 @@ function saveStateToLocalStorage() {
     localStorage.setItem('islamicPlatformState', JSON.stringify({
         misbahaTotal: appState.misbahaTotal,
         habits: appState.habits,
-        unlockedBadges: appState.unlockedBadges
+        unlockedBadges: appState.unlockedBadges,
+        savedAyahs: appState.savedAyahs
     }));
 }
 
@@ -470,8 +581,10 @@ function loadLocalStorageState() {
         appState.misbahaTotal = data.misbahaTotal || 0;
         appState.habits = data.habits || appState.habits;
         appState.unlockedBadges = data.unlockedBadges || [];
+        appState.savedAyahs = data.savedAyahs || [];
         document.getElementById('misbahaTotalDisplay').innerText = appState.misbahaTotal;
     }
+    renderSavedAyahs();
 }
 
 // Utility Helpers
