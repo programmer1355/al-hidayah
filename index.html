@@ -1,9 +1,13 @@
-<!DOCTYPE html>
+import os
+import zipfile
+
+# CREATE UPDATED INDEX.HTML
+html_content = """<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الهداية الرقمية المتكاملة | بوابة النور</title>
+    <title>ذِكرَى | منصتك الإسلامية المتكاملة</title>
     <!-- Tailwind CSS, FontAwesome, Google Fonts, & Custom CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -15,7 +19,7 @@
     <nav class="fixed top-0 left-0 right-0 h-16 bg-white/90 backdrop-blur-md shadow-sm z-50 flex justify-between items-center px-4 md:px-8 border-b transition-colors duration-300">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white text-xl font-bold shadow-md shadow-emerald-600/30">🕋</div>
-            <span class="text-xl font-extrabold text-emerald-700 tracking-wide font-amiri">بوابة الهِداية النُّورانية</span>
+            <span class="text-xl font-extrabold text-emerald-700 tracking-wide font-amiri">ذِكرَى</span>
         </div>
         
         <!-- Navbar actions -->
@@ -401,4 +405,13 @@
     <script src="athkar.js"></script>
     <script src="script.js"></script>
 </body>
-</html>
+</html>"""
+
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(html_content)
+
+zip_path = "zikra_index.zip"
+with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+    zipf.write("index.html")
+
+print("Generated zikra_index.zip successfully!")
