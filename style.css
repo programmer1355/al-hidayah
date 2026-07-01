@@ -1,18 +1,25 @@
-
 /* Professional Islamic Framework Stylesheet */
-@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;600;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@300;400;600;700;900&family=Scheherazade+New:wght@400;700&display=swap');
 
 :root {
     --primary-font: 'Cairo', sans-serif;
-    --quran-font: 'Amiri', serif;
+    --amiri-font: 'Amiri', serif;
+    --quran-font: 'Scheherazade New', serif; /* خط شهرزاد الجديد فائق الوضوح */
 }
 
 body {
     font-family: var(--primary-font);
     scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 .font-amiri {
+    font-family: var(--amiri-font);
+}
+
+.font-quran {
     font-family: var(--quran-font);
 }
 
@@ -70,4 +77,9 @@ body.dark-mode select, body.dark-mode input {
 .ayah-card:hover {
     transform: translateY(-2px);
     transition: all 0.2s ease-in-out;
+    background-color: #ecfdf5; /* emerald-50 equivalent */
+}
+
+body.dark-mode .ayah-card:hover {
+    background-color: #064e3b; /* dark mode highlight */
 }
