@@ -375,25 +375,45 @@ function requestLocationAccess() {
     } else fetchPrayerTimesAPI();
 }
 
+// دالة لتحويل الوقت من 24 ساعة إلى 12 ساعة
+function formatTime12Hour(time24) {
+    let timeStr = time24.substring(0, 5); // نأخذ الساعات والدقائق بس
+    let [hours, minutes] = timeStr.split(':');
+    hours = parseInt(hours, 10);
+    let ampm = hours >= 12 ? 'م' : 'ص';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // عشان الصفر يصير 12
+    let strHours = hours < 10 ? '0' + hours : hours; // نضيف صفر لو الرقم فردي عشان الترتيب
+    return `${strHours}:${minutes} ${ampm}`;
+}
+
 function fetchPrayerTimesAPI() {
     fetch(`https://api.aladhan.com/v1/timings?latitude=${appState.latitude}&longitude=${appState.longitude}&method=4`)
         .then(res => res.json())
         .then(payload => {
             const timings = payload.data.timings; const dates = payload.data.date;
-            document.getElementById('time-Fajr').innerText = timings.Fajr;
-            document.getElementById('time-Sunrise').innerText = timings.Sunrise;
-            document.getElementById('time-Dhuhr').innerText = timings.Dhuhr;
-            document.getElementById('time-Asr').innerText = timings.Asr;
-            document.getElementById('time-Maghrib').innerText = timings.Maghrib;
-            document.getElementById('time-Isha').innerText = timings.Isha;
+            
+            // إضافة الأوقات بعد تحويلها عن طريق الدالة الجديدة
+            document.getElementById('time-Fajr').innerText = formatTime12Hour(timings.Fajr);
+            document.getElementById('time-Sunrise').innerText = formatTime12Hour(timings.Sunrise);
+            document.getElementById('time-Dhuhr').innerText = formatTime12Hour(timings.Dhuhr);
+            document.getElementById('time-Asr').innerText = formatTime12Hour(timings.Asr);
+            document.getElementById('time-Maghrib').innerText = formatTime12Hour(timings.Maghrib);
+            document.getElementById('time-Isha').innerText = formatTime12Hour(timings.Isha);
             
             const hijriDisplay = document.getElementById('currentHijriDisplay');
             hijriDisplay.innerText = `${dates.hijri.day} ${dates.hijri.month.ar} ${dates.hijri.year} هـ`;
             hijriDisplay.dataset.apiUpdated = "true";
             
             appState.qiblaAngle = payload.data.meta.qibla || 21.4;
-            document.getElementById('quranQiblaAngle').innerText = Math.round(appState.qiblaAngle);
-            document.getElementById('compassDisc').style.transform = `rotate(${-appState.qiblaAngle}deg)`;
+            
+            // تحقق من وجود عناصر البوصلة قبل تحديثها (لأننا حذفناها سابقاً)
+            const qiblaAngleElement = document.getElementById('quranQiblaAngle');
+            const compassDiscElement = document.getElementById('compassDisc');
+            
+            if (qiblaAngleElement) qiblaAngleElement.innerText = Math.round(appState.qiblaAngle);
+            if (compassDiscElement) compassDiscElement.style.transform = `rotate(${-appState.qiblaAngle}deg)`;
+            
             document.getElementById('nextPrayerCountdown').innerText = "تم عرض مواقيت الصلاة للموقع المحدد بنجاح";
         });
 }
