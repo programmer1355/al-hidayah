@@ -510,4 +510,4 @@ function toggleMakkahModal(status) {
     if (status && !iframe.src.includes('5Mii2-g60p4')) iframe.src = "https://www.youtube.com/embed/5Mii2-g60p4?rel=0&autoplay=1";
 }
 function stopMakkahStream() { document.getElementById('makkahIframe').src = ""; toggleMakkahModal(false); alert('تم إيقاف البث.'); }
-document.getElementById('dashboardModeBtn').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => {}); else document.exitFullscreen(); });
+document.getElementById('dashboardModeBtn').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => {}); else document.exitFullscreen(); }); 
