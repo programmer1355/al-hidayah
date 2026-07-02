@@ -52,12 +52,16 @@ window.onload = function() {
 function initClock() {
     setInterval(() => {
         const now = new Date();
+        
+        // الوقت بتوقيت السعودية ونظام 12 ساعة (ص/م)
         const optionsTime = { timeZone: 'Asia/Riyadh', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
         document.getElementById('digitalClock').innerText = now.toLocaleTimeString('ar-SA', optionsTime);
         
-        const optionsGregorian = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        // التاريخ الميلادي بتوقيت السعودية
+        const optionsGregorian = { timeZone: 'Asia/Riyadh', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         document.getElementById('currentGregorianDisplay').innerText = now.toLocaleDateString('ar-SA', optionsGregorian);
         
+        // التاريخ الهجري
         const optionsHijri = { year: 'numeric', month: 'long', day: 'numeric' };
         const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', optionsHijri).format(now);
         
