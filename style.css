@@ -4,7 +4,6 @@
 :root {
     --primary-font: 'Cairo', sans-serif;
     --amiri-font: 'Amiri', serif;
-    /* استخدام خط القرآن الأصلي للحصول على وضوح المصحف الحقيقي */
     --quran-font: 'Amiri Quran', serif; 
 }
 
@@ -14,100 +13,59 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    /* منع التحديد العشوائي في الموبايل */
+    -webkit-tap-highlight-color: transparent;
 }
 
-.font-amiri {
-    font-family: var(--amiri-font);
-}
+.font-amiri { font-family: var(--amiri-font); }
+.font-quran { font-family: var(--quran-font); }
 
-.font-quran {
-    font-family: var(--quran-font);
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #f8fafc;
-}
-body.dark-mode ::-webkit-scrollbar-track {
-    background: #1e293b;
-}
-::-webkit-scrollbar-thumb {
-    background: #059669;
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #047857;
-}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #f8fafc; }
+body.dark-mode ::-webkit-scrollbar-track { background: #1e293b; }
+::-webkit-scrollbar-thumb { background: #059669; border-radius: 4px; }
 
 /* Dark mode overrides */
-body.dark-mode {
-    background-color: #0f172a;
-    color: #f8fafc;
-}
+body.dark-mode { background-color: #0f172a; color: #f8fafc; }
+body.dark-mode .bg-white, body.dark-mode .bg-slate-50, body.dark-mode .bg-[#fdfaf6] { background-color: #1e293b; color: #f8fafc; }
+body.dark-mode .border, body.dark-mode .border-slate-100, body.dark-mode .border-slate-200 { border-color: #334155; }
+body.dark-mode select, body.dark-mode input { background-color: #334155; color: #f8fafc; border-color: #475569; }
+body.dark-mode .text-slate-800, body.dark-mode .text-slate-700, body.dark-mode .text-stone-800 { color: #f1f5f9; }
 
-body.dark-mode .bg-white, body.dark-mode .bg-slate-50, body.dark-mode .bg-[#fdfaf6] {
-    background-color: #1e293b;
-    color: #f8fafc;
-}
+#compassDisc { transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.badge-unlocked { box-shadow: 0 0 15px rgba(16, 185, 129, 0.2); border: 2px solid #10b981; }
 
-body.dark-mode .border, body.dark-mode .border-slate-100, body.dark-mode .border-slate-200 { 
-    border-color: #334155; 
-}
-
-body.dark-mode select, body.dark-mode input {
-    background-color: #334155;
-    color: #f8fafc;
-    border-color: #475569;
-}
-
-body.dark-mode .text-slate-800, body.dark-mode .text-slate-700, body.dark-mode .text-stone-800 {
-    color: #f1f5f9;
-}
-
-/* Compass animations */
-#compassDisc {
-    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-/* Badge glow effects */
-.badge-unlocked {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
-    border: 2px solid #10b981;
-}
-
-/* Ayah Card designs */
+/* إصلاح لون القرآن ليكون واضح جداً ومقروء 100% في أي خلفية */
 .ayah-card {
-    line-height: 2.2 !important; /* تباعد الأسطر للقرآن */
+    color: #000000 !important; /* أسود فاحم صريح للنهار */
+    line-height: 2.3 !important; 
     padding: 2px 4px;
-    border-radius: 8px;
-    transition: all 0.2s ease-in-out;
-    /* حماية من تقطيع النص وتداخله */
+    border-radius: 6px;
+    transition: all 0.2s;
     word-wrap: break-word; 
-    scroll-margin-top: 150px; /* لكي لا تختفي الآية تحت الهيدر عند الانتقال إليها */
+    scroll-margin-top: 150px;
 }
-
+body.dark-mode .ayah-card {
+    color: #ffffff !important; /* أبيض ناصع صريح لليل */
+}
 .ayah-card:hover {
-    background-color: #ecfdf5; 
+    background-color: rgba(16, 185, 129, 0.1); 
     cursor: pointer;
 }
 
-body.dark-mode .ayah-card:hover {
-    background-color: #064e3b; 
-}
-
-/* الكلاس الذي يعطي إضاءة صفراء للآية عند الانتقال إليها من الحفظ */
+/* إضاءة الآية المحفوظة */
 .highlight-ayah {
     background-color: #fef08a !important;
     transition: background-color 1s ease-out;
-    border-radius: 8px;
 }
-
 body.dark-mode .highlight-ayah {
     background-color: #854d0e !important;
-    color: #fff !important;
 }
 
-/* اخفاء الشريط السفلي في شاشات الكمبيوتر ورفعه عند الهوفر تم برمجته عبر tailwind في الـ HTML */
+/* شريط الراديو السفلي للكمبيوتر والجوال */
+@media (max-width: 1023px) {
+    #bottomRadioBar {
+        /* في الجوال يثبت في الأعلى تحت الهيدر ولا يتأثر بالـ hover */
+        transform: translateY(0) !important;
+    }
+}
