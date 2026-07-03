@@ -682,7 +682,6 @@ async function loadAyahIndex() {
     } catch (error) {
         console.log("خطأ في جلب الفهرس:", error);
     }
-}
 
 // 2. جلب آيات السورة المحددة بالخط العثماني
 async function loadSpecificSurah(surahNumber) {
