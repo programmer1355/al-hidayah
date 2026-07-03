@@ -721,7 +721,6 @@ async function loadSpecificSurah(surahNumber) {
     } catch (error) {
         quranContainer.innerHTML = '<div class="text-center text-red-500 mt-10">حدث خطأ في تحميل السورة. تأكد من اتصالك بالإنترنت.</div>';
     }
-}
 
 // تشغيل الفهرس وسورة الفاتحة تلقائياً أول ما يفتح الموقع
 loadAyahIndex();
