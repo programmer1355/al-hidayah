@@ -96,15 +96,21 @@ body.dark-mode .highlight-ayah {
     min-height: 100vh;
 }
 
-.ayah-font {
-    font-family: 'Amiri Quran', serif;
-    font-size: 28px;
-    line-height: 2.5;
-    color: #1A1A1A;
-    text-align: justify;
-    direction: rtl;
+/* --- خط مجمع الملك فهد الأصلي (نفس تطبيق آية) --- */
+@font-face {
+    font-family: 'KFGQPC_Uthmanic';
+    src: url('https://cdn.rawgit.com/quran/quran.com-images/master/fonts/quran/KFGQPC_Uthmanic_Script_HAFS_Regular.ttf') format('truetype');
 }
 
+.ayah-font {
+    font-family: 'KFGQPC_Uthmanic', 'Amiri Quran', serif;
+    font-size: 34px; /* خط كبير وواضح مثل آية */
+    line-height: 2.2;
+    color: #111111;
+    text-align: justify;
+    direction: rtl;
+    text-shadow: 0px 0px 1px rgba(0,0,0,0.1);
+}
 /* لتنسيق أرقام الآيات مثل المصحف */
 .ayah-number {
     display: inline-flex;
