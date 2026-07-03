@@ -571,8 +571,8 @@ function sendFeedback() {
 
 window.addEventListener('DOMContentLoaded', () => {
     updateVideoPlayer();
+    switchTab('mainDashboard');
 });
-
 // ==========================================
 // ساعة وتاريخ القائمة الرئيسية
 // ==========================================
