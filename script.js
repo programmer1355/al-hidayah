@@ -609,27 +609,68 @@ function setMainHijriDate() {
     }
 }
 setMainHijriDate();
+// --- نظام تطبيق آية المتكامل ---
 
-// نظام التركيز الخاص بتطبيق آية
 let isAyahFocusMode = false;
 
 function toggleAyahControls() {
     isAyahFocusMode = !isAyahFocusMode;
-    
-    // إخفاء القائمة السفلية
     const bottomNav = document.querySelector('.lg\\:hidden.fixed.bottom-0');
     if (bottomNav) {
         bottomNav.style.transition = "transform 0.3s ease";
         bottomNav.style.transform = isAyahFocusMode ? "translateY(100%)" : "translateY(0)";
     }
-
-    // إخفاء شريط آية العلوي
     const topBar = document.getElementById('ayahTopBar');
     if (topBar) {
         topBar.style.transform = isAyahFocusMode ? "translateY(-100%)" : "translateY(0)";
     }
 }
 
+function openAyahIndex() { document.getElementById('ayahIndexModal').classList.remove('hidden'); document.getElementById('ayahIndexModal').classList.add('flex'); }
+function closeAyahIndex() { document.getElementById('ayahIndexModal').classList.add('hidden'); document.getElementById('ayahIndexModal').classList.remove('flex'); }
+function openAyahSearch() { document.getElementById('ayahSearchModal').classList.remove('hidden'); document.getElementById('ayahSearchModal').classList.add('flex'); document.getElementById('quranSearchInput').focus(); }
+function closeAyahSearch() { document.getElementById('ayahSearchModal').classList.add('hidden'); document.getElementById('ayahSearchModal').classList.remove('flex'); }
+
+async function loadAyahIndex() {
+    try {
+        const response = await fetch('https://api.alquran.cloud/v1/surah');
+        const data = await response.json();
+        const indexContainer = document.getElementById('surahListContainer');
+        if (indexContainer) {
+            indexContainer.innerHTML = '';
+            data.data.forEach(surah => {
+                const surahDiv = document.createElement('div');
+                surahDiv.className = 'p-4 border-b border-slate-100 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition rounded-xl';
+                surahDiv.onclick = () => { loadSpecificSurah(surah.number); closeAyahIndex(); };
+                surahDiv.innerHTML = `<div class="flex items-center gap-4"><div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-400 font-mono">${surah.number}</div><div><h3 class="font-bold text-lg font-amiri text-slate-800">${surah.name}</h3><p class="text-xs text-slate-400">${surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} • ${surah.numberOfAyahs} آيات</p></div></div>`;
+                indexContainer.appendChild(surahDiv);
+            });
+        }
+    } catch (e) { console.log(e); }
+}
+
+async function loadSpecificSurah(num) {
+    const q = document.getElementById('ayah-container');
+    const t = document.getElementById('currentSurahTitle');
+    if (!q || !t) return;
+    q.innerHTML = '<div class="text-center text-slate-400 mt-10">جاري الجلب...</div>';
+    try {
+        const res = await fetch(`https://api.alquran.cloud/v1/surah/${num}/quran-uthmani`);
+        const data = await res.json();
+        const s = data.data;
+        t.innerText = s.name;
+        let html = (num !== 1 && num !== 9) ? '<div class="text-center mb-8 text-2xl text-emerald-800">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>' : '';
+        s.ayahs.forEach(a => {
+            let txt = a.text;
+            if (num !== 1 && a.numberInSurah === 1 && txt.startsWith('بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ ')) txt = txt.replace('بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ ', '');
+            html += `${txt} <span class="ayah-number">${a.numberInSurah.toLocaleString('ar-EG')}</span> `;
+        });
+        q.innerHTML = html;
+    } catch (e) { q.innerHTML = 'خطأ في التحميل'; }
+}
+
+loadAyahIndex();
+loadSpecificSurah(1);
 // دوال التحكم بشاشات آية (الفهرس والبحث)
 function openAyahIndex() { 
     document.getElementById('ayahIndexModal').classList.remove('hidden'); 
