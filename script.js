@@ -518,3 +518,57 @@ function toggleMobileAudioBar() {
         arrow.classList.replace('fa-chevron-down', 'fa-chevron-up');
     }
 }
+
+// ==========================================
+// نظام سلايدر الفيديوهات (القائمة الرئيسية)
+// ==========================================
+
+const videoList = [
+    "5Mii2-g6Op4", // مثال 1
+    "dQw4w9WgXcQ", // مثال 2
+    "tPEE9ZwTmy0"  // مثال 3
+];
+
+let currentVideoIndex = 0;
+
+function updateVideoPlayer() {
+    const player = document.getElementById('mainVideoPlayer');
+    const counter = document.getElementById('videoCounter');
+    
+    if (player && counter) {
+        player.src = `https://www.youtube.com/embed/${videoList[currentVideoIndex]}?rel=0`;
+        counter.innerText = `${currentVideoIndex + 1} / ${videoList.length}`;
+    }
+}
+
+function nextVideo() {
+    if (currentVideoIndex < videoList.length - 1) {
+        currentVideoIndex++;
+    } else {
+        currentVideoIndex = 0; 
+    }
+    updateVideoPlayer();
+}
+
+function prevVideo() {
+    if (currentVideoIndex > 0) {
+        currentVideoIndex--;
+    } else {
+        currentVideoIndex = videoList.length - 1; 
+    }
+    updateVideoPlayer();
+}
+
+function sendFeedback() {
+    const text = document.getElementById('feedbackText');
+    if(text && text.value.trim() === "") {
+        alert("الرجاء كتابة اقتراحك أولاً!");
+        return;
+    }
+    alert("تم استلام رسالتك بنجاح! سيتم ربطها قريباً.");
+    if(text) text.value = ""; 
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+    updateVideoPlayer();
+});
