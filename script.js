@@ -604,3 +604,19 @@ function setMainHijriDate() {
     }
 }
 setMainHijriDate();
+
+// دالة تشغيل وضع آية للتركيز
+function toggleFocusMode() {
+    const body = document.body;
+    const readerContainer = document.getElementById('view-quranRead');
+    
+    // تفعيل وضع التركيز
+    body.classList.toggle('focus-mode');
+    
+    // إذا كان هناك قائمة جانبية نريد إخفاءها
+    const sidebar = document.getElementById('sidebar-navigation');
+    if(sidebar) sidebar.classList.toggle('hidden');
+    
+    // رسالة تأكيد للمستخدم
+    console.log("تم تفعيل وضع القراءة - تجربة آية");
+}
