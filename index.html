@@ -154,7 +154,114 @@
 
         <!-- VIEWPORTS PAGES PORTAL CONTENT CONTAINER -->
         <main class="flex-1 bg-white p-4 md:p-8 rounded-3xl shadow-sm border border-slate-200 transition-colors duration-300 min-h-[600px] mb-6 lg:mb-0">
+            <div id="mainDashboardSection" class="page-section pb-24 pt-4 px-4 w-full max-w-3xl mx-auto">
+        
+        <div class="bg-emerald-800 rounded-3xl p-6 text-white text-center shadow-lg relative overflow-hidden mb-6">
+            <div class="absolute top-4 left-4 opacity-40"><i class="fas fa-star text-amber-200"></i></div>
+            <div class="absolute bottom-4 right-4 opacity-40 text-2xl"><i class="fas fa-sparkles text-amber-200"></i></div>
             
+            <p class="bg-emerald-700/60 inline-block px-4 py-1 rounded-full text-xs font-bold mb-3" id="mainHijriDate">جاري تحميل التاريخ...</p>
+            <div class="text-6xl font-bold font-sans mb-2 tracking-wider" id="mainDigitalClock">00:00:00</div>
+            <p class="text-emerald-200 text-sm font-bold mb-4" id="mainNextPrayer">باقي على الصلاة القادمة: --:--</p>
+            <div class="bg-amber-500/20 text-amber-300 px-4 py-2 rounded-xl text-xs font-bold border border-amber-500/30">
+                <i class="fas fa-map-marker-alt ml-1"></i> تم عرض مواقيت الصلاة للموقع بنجاح
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-4 shadow-md border border-slate-100 mb-6">
+            <h3 class="text-emerald-800 font-bold mb-3 text-center text-sm"><i class="fab fa-youtube ml-1 text-red-500"></i> مقاطع مختارة</h3>
+            
+            <div class="relative w-full aspect-video bg-slate-900 rounded-2xl overflow-hidden mb-4 shadow-inner">
+                <iframe id="mainVideoPlayer" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+
+            <div class="flex justify-between items-center px-2">
+                <button onclick="nextVideo()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 w-10 h-10 rounded-full flex items-center justify-center transition shadow-sm"><i class="fas fa-chevron-right"></i></button>
+                <div class="text-xs text-slate-500 font-bold bg-slate-50 px-4 py-1.5 rounded-full border border-slate-100" id="videoCounter">1 / 20</div>
+                <button onclick="prevVideo()" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-800 w-10 h-10 rounded-full flex items-center justify-center transition shadow-sm"><i class="fas fa-chevron-left"></i></button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl p-5 shadow-md border border-slate-100 mb-6">
+            <h3 class="text-emerald-800 font-bold mb-3 text-sm"><i class="fas fa-comment-dots ml-1"></i> الشكاوى والاقتراحات</h3>
+            <textarea id="feedbackText" rows="3" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm focus:outline-none focus:border-emerald-500 mb-3 placeholder-slate-400 transition" placeholder="اكتب اقتراحك، مشكلتك، أو فكرتك هنا..."></textarea>
+            <button onclick="sendFeedback()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow-md text-sm"><i class="fas fa-paper-plane ml-1"></i> إرسال</button>
+        </div>
+
+        <div class="text-center mt-8 mb-6">
+            <p class="text-slate-400 text-xs font-bold tracking-wide">جميع الحقوق محفوظة إلى عابد &copy; 2026</p>
+        </div>
+
+    </div>
+    ```
+
+---
+
+### الخطوة الثانية: برمجة تقليب الفيديوهات
+افتح ملف `script.js`، وانزل **لآخر سطر فيه**، والصق هذا الكود اللي بيشغل لك سلايدر الفيديوهات بشكل ذكي (حطيت لك 3 مقاطع كأمثلة، وتقدر تعدلها بعدين لـ 20 مقطع براحتك):
+
+```javascript
+// ==========================================
+// نظام سلايدر الفيديوهات (القائمة الرئيسية)
+// ==========================================
+
+// هنا تحط معرفات (IDs) مقاطع اليوتيوب الغير مدرجة حقتك
+const videoList = [
+    "5Mii2-g6Op4", // مثال 1 (بث الحرم مثلاً)
+    "dQw4w9WgXcQ", // مثال 2
+    "tPEE9ZwTmy0"  // مثال 3
+    // تقدر تنسخ وتضيف إلين 20 سطر هنا
+];
+
+let currentVideoIndex = 0;
+
+// دالة تحديث شاشة الفيديو والعداد
+function updateVideoPlayer() {
+    const player = document.getElementById('mainVideoPlayer');
+    const counter = document.getElementById('videoCounter');
+    
+    // نركب رابط اليوتيوب الجديد (rel=0 عشان ما تطلع فيديوهات مقترحة غريبة)
+    player.src = `https://www.youtube.com/embed/${videoList[currentVideoIndex]}?rel=0`;
+    
+    // نحدث الأرقام اللي تحت (مثلاً: 1 / 20)
+    counter.innerText = `${currentVideoIndex + 1} / ${videoList.length}`;
+}
+
+// دالة الانتقال للفيديو التالي
+function nextVideo() {
+    if (currentVideoIndex < videoList.length - 1) {
+        currentVideoIndex++;
+    } else {
+        currentVideoIndex = 0; // إذا وصل الأخير، يرجع للأول
+    }
+    updateVideoPlayer();
+}
+
+// دالة الرجوع للفيديو السابق
+function prevVideo() {
+    if (currentVideoIndex > 0) {
+        currentVideoIndex--;
+    } else {
+        currentVideoIndex = videoList.length - 1; // إذا كان في الأول، يروح للأخير
+    }
+    updateVideoPlayer();
+}
+
+// دالة مؤقتة لزر الإرسال (بنعطيه برمجة حقيقية لاحقاً)
+function sendFeedback() {
+    const text = document.getElementById('feedbackText').value;
+    if(text.trim() === "") {
+        alert("الرجاء كتابة اقتراحك أولاً!");
+        return;
+    }
+    alert("تم استلام رسالتك بنجاح! سيتم ربطها قريباً.");
+    document.getElementById('feedbackText').value = ""; // تفريغ الصندوق
+}
+
+// تشغيل أول فيديو تلقائياً أول ما يفتح الموقع
+window.addEventListener('DOMContentLoaded', () => {
+    updateVideoPlayer();
+});
             <!-- SECTION 1: QURAN APPS SCREEN -->
             <div id="view-quran" class="space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
