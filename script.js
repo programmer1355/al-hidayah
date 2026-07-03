@@ -625,3 +625,23 @@ function toggleFocusMode() {
     // رسالة تأكيد للمستخدم
     console.log("تم تفعيل وضع القراءة - تجربة آية");
 }
+// نظام التركيز الخاص بتطبيق آية
+let isAyahFocusMode = false;
+
+function toggleAyahControls() {
+    isAyahFocusMode = !isAyahFocusMode;
+    
+    // إخفاء/إظهار القائمة السفلية للجوال
+    const bottomNav = document.querySelector('.lg\\:hidden.fixed.bottom-0');
+    if (bottomNav) {
+        bottomNav.style.transition = "transform 0.3s ease";
+        bottomNav.style.transform = isAyahFocusMode ? "translateY(100%)" : "translateY(0)";
+    }
+
+    // إخفاء/إظهار الشريط العلوي (النافبار)
+    const topNav = document.querySelector('nav');
+    if (topNav) {
+        topNav.style.transition = "transform 0.3s ease";
+        topNav.style.transform = isAyahFocusMode ? "translateY(-100%)" : "translateY(0)";
+    }
+}
