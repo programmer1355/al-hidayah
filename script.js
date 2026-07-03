@@ -610,38 +610,121 @@ function setMainHijriDate() {
 }
 setMainHijriDate();
 
-// دالة تشغيل وضع آية للتركيز
-function toggleFocusMode() {
-    const body = document.body;
-    const readerContainer = document.getElementById('view-quranRead');
-    
-    // تفعيل وضع التركيز
-    body.classList.toggle('focus-mode');
-    
-    // إذا كان هناك قائمة جانبية نريد إخفاءها
-    const sidebar = document.getElementById('sidebar-navigation');
-    if(sidebar) sidebar.classList.toggle('hidden');
-    
-    // رسالة تأكيد للمستخدم
-    console.log("تم تفعيل وضع القراءة - تجربة آية");
-}
 // نظام التركيز الخاص بتطبيق آية
 let isAyahFocusMode = false;
 
 function toggleAyahControls() {
     isAyahFocusMode = !isAyahFocusMode;
     
-    // إخفاء/إظهار القائمة السفلية للجوال
+    // إخفاء القائمة السفلية
     const bottomNav = document.querySelector('.lg\\:hidden.fixed.bottom-0');
     if (bottomNav) {
         bottomNav.style.transition = "transform 0.3s ease";
         bottomNav.style.transform = isAyahFocusMode ? "translateY(100%)" : "translateY(0)";
     }
 
-    // إخفاء/إظهار الشريط العلوي (النافبار)
-    const topNav = document.querySelector('nav');
-    if (topNav) {
-        topNav.style.transition = "transform 0.3s ease";
-        topNav.style.transform = isAyahFocusMode ? "translateY(-100%)" : "translateY(0)";
+    // إخفاء شريط آية العلوي
+    const topBar = document.getElementById('ayahTopBar');
+    if (topBar) {
+        topBar.style.transform = isAyahFocusMode ? "translateY(-100%)" : "translateY(0)";
     }
 }
+
+// دوال التحكم بشاشات آية (الفهرس والبحث)
+function openAyahIndex() { 
+    document.getElementById('ayahIndexModal').classList.remove('hidden'); 
+    document.getElementById('ayahIndexModal').classList.add('flex'); 
+}
+function closeAyahIndex() { 
+    document.getElementById('ayahIndexModal').classList.add('hidden'); 
+    document.getElementById('ayahIndexModal').classList.remove('flex'); 
+}
+function openAyahSearch() { 
+    document.getElementById('ayahSearchModal').classList.remove('hidden'); 
+    document.getElementById('ayahSearchModal').classList.add('flex'); 
+    document.getElementById('quranSearchInput').focus(); 
+}
+function closeAyahSearch() { 
+    document.getElementById('ayahSearchModal').classList.add('hidden'); 
+    document.getElementById('ayahSearchModal').classList.remove('flex'); 
+}
+}
+// --- محرك جلب السور والآيات (القلب النابض) ---
+
+// 1. جلب الفهرس (أسماء الـ 114 سورة)
+async function loadAyahIndex() {
+    try {
+        const response = await fetch('https://api.alquran.cloud/v1/surah');
+        const data = await response.json();
+        const indexContainer = document.getElementById('surahListContainer');
+        indexContainer.innerHTML = ''; // تنظيف القائمة
+        
+        data.data.forEach(surah => {
+            const surahDiv = document.createElement('div');
+            // تصميم زر السورة في الفهرس (فخم ومريح للعين)
+            surahDiv.className = 'p-4 border-b border-slate-100 flex items-center justify-between cursor-pointer hover:bg-slate-50 transition rounded-xl';
+            surahDiv.onclick = () => {
+                loadSpecificSurah(surah.number);
+                closeAyahIndex(); // قفل الفهرس بعد الاختيار
+            };
+            
+            surahDiv.innerHTML = `
+                <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-400 font-mono">${surah.number}</div>
+                    <div>
+                        <h3 class="font-bold text-lg font-amiri text-slate-800">${surah.name}</h3>
+                        <p class="text-xs text-slate-400">${surah.revelationType === 'Meccan' ? 'مكية' : 'مدنية'} • ${surah.numberOfAyahs} آيات</p>
+                    </div>
+                </div>
+            `;
+            indexContainer.appendChild(surahDiv);
+        });
+    } catch (error) {
+        console.log("خطأ في جلب الفهرس:", error);
+    }
+}
+
+// 2. جلب آيات السورة المحددة بالخط العثماني
+async function loadSpecificSurah(surahNumber) {
+    const quranContainer = document.getElementById('ayah-container');
+    const titleDisplay = document.getElementById('currentSurahTitle');
+    
+    // علامة التحميل الأنيقة
+    quranContainer.innerHTML = '<div class="text-center text-slate-400 mt-10"><i class="fas fa-spinner fa-spin text-3xl mb-4"></i><br>جاري جلب الآيات...</div>';
+    
+    try {
+        const response = await fetch(`https://api.alquran.cloud/v1/surah/${surahNumber}/quran-uthmani`);
+        const data = await response.json();
+        const surah = data.data;
+        
+        titleDisplay.innerText = surah.name; // تحديث اسم السورة في الشريط العلوي
+        let ayahsText = '';
+        
+        // إضافة البسملة المستقلة (إلا للفاتحة والتوبة)
+        if (surahNumber !== 1 && surahNumber !== 9) {
+            ayahsText += '<div class="text-center mb-8 text-2xl text-emerald-800">بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ</div>';
+        }
+
+        surah.ayahs.forEach(ayah => {
+            let text = ayah.text;
+            // تنظيف البسملة المدمجة عشان ما تتكرر
+            if (surahNumber !== 1 && ayah.numberInSurah === 1 && text.startsWith('بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ ')) {
+                text = text.replace('بِسۡمِ ٱللَّهِ ٱلرَّحۡمَٰنِ ٱلرَّحِيمِ ', '');
+            }
+            
+            // تحويل الرقم لعربي أصيل
+            const arabicNumber = ayah.numberInSurah.toLocaleString('ar-EG');
+            ayahsText += `${text} <span class="ayah-number">${arabicNumber}</span> `;
+        });
+        
+        quranContainer.innerHTML = ayahsText;
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // رفع الشاشة فوق بسلاسة
+        
+    } catch (error) {
+        quranContainer.innerHTML = '<div class="text-center text-red-500 mt-10">حدث خطأ في تحميل السورة. تأكد من اتصالك بالإنترنت.</div>';
+    }
+}
+
+// تشغيل الفهرس وسورة الفاتحة تلقائياً أول ما يفتح الموقع
+loadAyahIndex();
+loadSpecificSurah(1);
