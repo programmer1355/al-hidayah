@@ -440,5 +440,13 @@
 
     <script src="athkar.js"></script>
     <script src="script.js"></script>
+    <script>
+    // هذا الأمر يجبر الموقع يفتح الصفحة الرئيسية فوراً عند الدخول
+    window.addEventListener('DOMContentLoaded', (event) => {
+        if(typeof switchTab === 'function') {
+            switchTab('mainDashboard');
+        }
+    });
+</script>
 </body>
 </html>
