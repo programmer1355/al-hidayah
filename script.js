@@ -572,3 +572,42 @@ function sendFeedback() {
 window.addEventListener('DOMContentLoaded', () => {
     updateVideoPlayer();
 });
+
+// ==========================================
+// ساعة وتاريخ القائمة الرئيسية
+// ==========================================
+
+function updateMainClock() {
+    const clockEl = document.getElementById('mainDigitalClock');
+    if (clockEl) {
+        const now = new Date();
+        let hours = now.getHours();
+        let minutes = now.getMinutes();
+        let seconds = now.getSeconds();
+        
+        // ضبط التنسيق (صباحاً/مساءً)
+        let ampm = hours >= 12 ? 'م' : 'ص';
+        hours = hours % 12;
+        hours = hours ? hours : 12; 
+        
+        // إضافة صفر لو الرقم أقل من 10 (عشان يطلع شكلها 09:05 مو 9:5)
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+        
+        clockEl.innerText = `${hours}:${minutes}:${seconds} ${ampm}`;
+    }
+}
+// تحديث الساعة كل ثانية
+setInterval(updateMainClock, 1000);
+updateMainClock();
+
+// دالة جلب التاريخ الهجري
+function setMainHijriDate() {
+    const dateEl = document.getElementById('mainHijriDate');
+    if(dateEl) {
+        const options = { numberingSystem: 'arab', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', options).format(new Date());
+        dateEl.innerText = hijriDate;
+    }
+}
+setMainHijriDate();
