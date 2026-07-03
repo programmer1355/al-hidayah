@@ -648,7 +648,6 @@ function closeAyahSearch() {
     document.getElementById('ayahSearchModal').classList.add('hidden'); 
     document.getElementById('ayahSearchModal').classList.remove('flex'); 
 }
-}
 // --- محرك جلب السور والآيات (القلب النابض) ---
 
 // 1. جلب الفهرس (أسماء الـ 114 سورة)
