@@ -387,9 +387,13 @@
 
     <!-- MOBILE BOTTOM NAVIGATION APP BAR (Only visible on Mobile) -->
     <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 z-50 flex justify-around items-center pt-2 pb-5 md:pb-3 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-        <button onclick="switchTab('quran')" id="mobileTab-quran" class="mobile-nav-btn text-emerald-600 flex flex-col items-center p-1 w-16 transition-transform active:scale-95">
-            <i class="fas fa-book-quran text-xl mb-1 drop-shadow-sm"></i><span class="text-[10px] font-bold">المصحف</span>
-        </button>
+      <button onclick="switchTab('mainDashboard')" id="mobileTab-mainDashboard" class="mobile-nav-btn text-emerald-600 flex flex-col items-center p-1 w-16 transition-transform active:scale-95">
+    <i class="fas fa-home text-xl mb-1 drop-shadow-sm"></i><span class="text-[10px] font-bold">الرئيسية</span>
+</button>
+        
+<button onclick="switchTab('quran')" id="mobileTab-quran" class="mobile-nav-btn text-slate-400 hover:text-emerald-500 flex flex-col items-center p-1 w-16 transition-transform active:scale-95">
+    <i class="fas fa-book-quran text-xl mb-1"></i><span class="text-[10px] font-bold">المصحف</span>
+</button>
         <button onclick="switchTab('athkar')" id="mobileTab-athkar" class="mobile-nav-btn text-slate-400 hover:text-emerald-500 flex flex-col items-center p-1 w-16 transition-transform active:scale-95">
             <i class="fas fa-hands-praying text-xl mb-1"></i><span class="text-[10px] font-bold">الأذكار</span>
         </button>
