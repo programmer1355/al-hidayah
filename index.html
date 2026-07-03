@@ -193,75 +193,7 @@
         </div>
 
     </div>
-    ```
-
----
-
-### الخطوة الثانية: برمجة تقليب الفيديوهات
-افتح ملف `script.js`، وانزل **لآخر سطر فيه**، والصق هذا الكود اللي بيشغل لك سلايدر الفيديوهات بشكل ذكي (حطيت لك 3 مقاطع كأمثلة، وتقدر تعدلها بعدين لـ 20 مقطع براحتك):
-
-```javascript
-// ==========================================
-// نظام سلايدر الفيديوهات (القائمة الرئيسية)
-// ==========================================
-
-// هنا تحط معرفات (IDs) مقاطع اليوتيوب الغير مدرجة حقتك
-const videoList = [
-    "5Mii2-g6Op4", // مثال 1 (بث الحرم مثلاً)
-    "dQw4w9WgXcQ", // مثال 2
-    "tPEE9ZwTmy0"  // مثال 3
-    // تقدر تنسخ وتضيف إلين 20 سطر هنا
-];
-
-let currentVideoIndex = 0;
-
-// دالة تحديث شاشة الفيديو والعداد
-function updateVideoPlayer() {
-    const player = document.getElementById('mainVideoPlayer');
-    const counter = document.getElementById('videoCounter');
-    
-    // نركب رابط اليوتيوب الجديد (rel=0 عشان ما تطلع فيديوهات مقترحة غريبة)
-    player.src = `https://www.youtube.com/embed/${videoList[currentVideoIndex]}?rel=0`;
-    
-    // نحدث الأرقام اللي تحت (مثلاً: 1 / 20)
-    counter.innerText = `${currentVideoIndex + 1} / ${videoList.length}`;
-}
-
-// دالة الانتقال للفيديو التالي
-function nextVideo() {
-    if (currentVideoIndex < videoList.length - 1) {
-        currentVideoIndex++;
-    } else {
-        currentVideoIndex = 0; // إذا وصل الأخير، يرجع للأول
-    }
-    updateVideoPlayer();
-}
-
-// دالة الرجوع للفيديو السابق
-function prevVideo() {
-    if (currentVideoIndex > 0) {
-        currentVideoIndex--;
-    } else {
-        currentVideoIndex = videoList.length - 1; // إذا كان في الأول، يروح للأخير
-    }
-    updateVideoPlayer();
-}
-
-// دالة مؤقتة لزر الإرسال (بنعطيه برمجة حقيقية لاحقاً)
-function sendFeedback() {
-    const text = document.getElementById('feedbackText').value;
-    if(text.trim() === "") {
-        alert("الرجاء كتابة اقتراحك أولاً!");
-        return;
-    }
-    alert("تم استلام رسالتك بنجاح! سيتم ربطها قريباً.");
-    document.getElementById('feedbackText').value = ""; // تفريغ الصندوق
-}
-
-// تشغيل أول فيديو تلقائياً أول ما يفتح الموقع
-window.addEventListener('DOMContentLoaded', () => {
-    updateVideoPlayer();
-});
+   
             <!-- SECTION 1: QURAN APPS SCREEN -->
             <div id="view-quran" class="space-y-6">
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-slate-100 pb-4">
