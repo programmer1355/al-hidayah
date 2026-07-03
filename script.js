@@ -506,11 +506,22 @@ function toggleMobileAudioBar() {
 // ==========================================
 
 const videoList = [
-    "5Mii2-g6Op4", // مثال 1
-    "dQw4w9WgXcQ", // مثال 2
-    "tPEE9ZwTmy0"  // مثال 3
+    'mjyibbtMC9w',
+    'NtQbyRpebKw',
+    'JKkPiFZbcJU',
+    'wb-UgtM_VA0',
+    'Mnvjsja47_0',
+    'zcPe5Kx-fMI',
+    'cKxdnHyxfL8',
+    'Iglobam87AQ',
+    'ofpa1ttmflg',
+    'OjkGRufr5jk',
+    'zbPXk6XlPxA',
+    'aPthelFnPlU',
+    'dLRWg7LisD0',
+    'dcRhJua4Eo0',
+    'PeWbawj19fs'
 ];
-
 let currentVideoIndex = 0;
 
 function updateVideoPlayer() {
