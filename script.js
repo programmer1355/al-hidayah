@@ -55,21 +55,26 @@ function initClock() {
 
 // 3. CORE TABS SWITCH LOGIC (يدعم الجوال والكمبيوتر)
 function switchTab(tabId) {
-    // Hide all views
-    document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
-    
-    // Show selected view
-    const view = document.getElementById(`view-${tabId}`);
-    if(view) view.classList.remove('hidden');
-    
-    // Update Desktop Tabs
+    // 1. القناص: إخفاء أي صفحة تبدأ بكلمة view- في الموقع كله
+    document.querySelectorAll('[id^="view-"]').forEach(page => {
+        page.classList.add('hidden');
+    });
+
+    // 2. إظهار الصفحة المختارة ورفع الشاشة لأعلى
+    const target = document.getElementById('view-' + tabId);
+    if (target) {
+        target.classList.remove('hidden');
+        window.scrollTo(0, 0); 
+    }
+
+    // Update Desktop Tabs (تلوين أزرار الكمبيوتر)
     document.querySelectorAll('[id^="tabBtn-"]').forEach(btn => {
         btn.className = "w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm text-slate-600 hover:bg-slate-50 transition border border-transparent";
     });
     const activeDesktopBtn = document.getElementById(`tabBtn-${tabId}`);
     if(activeDesktopBtn) activeDesktopBtn.className = "w-full text-right px-4 py-3.5 rounded-2xl flex items-center gap-3 font-bold text-sm bg-emerald-50 text-emerald-700 transition shadow-sm border border-emerald-100";
-    
-    // Update Mobile Tabs
+
+    // Update Mobile Tabs (تلوين أزرار الجوال)
     document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
         btn.className = "mobile-nav-btn text-slate-400 hover:text-emerald-500 flex flex-col items-center p-1 w-16 transition-transform active:scale-95";
     });
@@ -78,7 +83,7 @@ function switchTab(tabId) {
         activeMobileBtn.className = "mobile-nav-btn text-emerald-600 flex flex-col items-center p-1 w-16 transition-transform active:scale-95";
         activeMobileBtn.querySelector('i').classList.add('drop-shadow-sm');
     }
-    
+
     appState.currentTab = tabId;
 }
 
