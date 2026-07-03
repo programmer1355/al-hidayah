@@ -371,20 +371,20 @@
                 </div>
                 <div class="bg-white border-2 border-slate-100 rounded-3xl p-6 min-h-[200px] font-quran text-2xl text-right text-stone-800 hidden" id="testerWorkspace"></div>
             </div>
-            <!-- حاوية القراءة المتكاملة -->
-<div id="view-quranRead" class="hidden reading-mode">
-<div id="quran-content" class="text-center">
-<!-- هنا سيتم حقن الآيات عن طريق JavaScript -->
-<h2 class="text-3xl font-bold mb-8">سورة الفاتحة</h2>
-<p class="ayah-text text-xl">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ (1) الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ (2)...</p>
-</div>
-
-<!-- أدوات التحكم السفلية (مثل تطبيق آية) -->
-<div class="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-t flex justify-center gap-6">
-<button onclick="toggleFocusMode()" class="p-2 bg-emerald-600 text-white rounded-full">
-خروج من وضع القراءة
-</button>
-</div>
+          <!-- واجهة تطبيق آية -->
+<div id="view-quranRead" class="hidden ayah-theme-bg w-full">
+    <!-- مساحة القراءة (تغطي الشاشة وتستجيب للمس) -->
+    <div onclick="toggleAyahControls()" class="min-h-screen px-4 md:px-10 pt-24 pb-32 cursor-pointer">
+        <h2 class="text-3xl font-bold mb-8 text-center text-emerald-800">سورة الفاتحة</h2>
+        
+        <!-- هنا سيتم حقن الآيات لاحقاً -->
+        <div class="ayah-font" id="ayah-container">
+            بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ <span class="ayah-number">١</span>
+            الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ <span class="ayah-number">٢</span>
+            الرَّحْمَنِ الرَّحِيمِ <span class="ayah-number">٣</span>
+            مَالِكِ يَوْمِ الدِّينِ <span class="ayah-number">٤</span>
+        </div>
+    </div>
 </div>
 
         </main>
