@@ -69,3 +69,24 @@ body.dark-mode .highlight-ayah {
         transform: translateY(0) !important;
     }
 }
+/* تنسيق تجربة القراءة المتكاملة */
+.reading-mode {
+    font-family: 'Amiri', serif; /* خط أميري هو الأقرب للفخامة */
+    line-height: 2.2; /* تباعد الأسطر المريح */
+    font-size: 24px;
+    color: #1a202c;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+/* وضع التركيز (Focus Mode) - إخفاء المشتتات */
+.focus-mode header, .focus-mode nav, .focus-mode footer {
+    display: none !important;
+}
+
+.focus-mode main {
+    background-color: #f7fafc; /* لون الخلفية المريح للعين */
+    min-height: 100vh;
+}
