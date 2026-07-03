@@ -90,3 +90,32 @@ body.dark-mode .highlight-ayah {
     background-color: #f7fafc; /* لون الخلفية المريح للعين */
     min-height: 100vh;
 }
+/* --- هوية تطبيق آية --- */
+.ayah-theme-bg {
+    background-color: #FAFAFA !important; /* لون آية المريح */
+    min-height: 100vh;
+}
+
+.ayah-font {
+    font-family: 'Amiri Quran', serif;
+    font-size: 28px;
+    line-height: 2.5;
+    color: #1A1A1A;
+    text-align: justify;
+    direction: rtl;
+}
+
+/* لتنسيق أرقام الآيات مثل المصحف */
+.ayah-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 35px;
+    height: 35px;
+    background-image: url('https://cdn.rawgit.com/quran/quran.com-images/master/images/ayah.png'); /* زخرفة رقم الآية */
+    background-size: contain;
+    background-repeat: no-repeat;
+    font-size: 14px;
+    margin: 0 8px;
+    color: #2D3748;
+}
