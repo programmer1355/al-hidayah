@@ -440,15 +440,14 @@
 
     <script src="athkar.js"></script>
     <script src="script.js"></script>
-<script>
-    // استخدمنا load مع تأخير بسيط جداً لضمان تثبيت الواجهة كآخر أمر يتنفذ
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            if(typeof switchTab === 'function') {
-                switchTab('mainDashboard');
-            }
-        }, 150); // تأخير 150 ملي ثانية لإنهاء أي تداخل
-    });
+<style>
+    /* الحل النووي لإجبار الواجهة الرئيسية على البقاء */
+    #view-mainDashboard {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+</style>
 </script>
 </script>
 </body>
