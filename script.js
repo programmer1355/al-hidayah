@@ -503,21 +503,18 @@ function toggleMakkahModal(status) {
 function stopMakkahStream() { document.getElementById('makkahIframe').src = ""; toggleMakkahModal(false); alert('تم إيقاف البث.'); }
 document.getElementById('dashboardModeBtn').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => {}); else document.exitFullscreen(); }); 
 
-// دالة فتح وإغلاق مشغل الصوت في الجوال (انزلاق ناعم ومضمون)
+// دالة فتح وإغلاق مشغل الصوت في الجوال بذكاء وسرعة
 function toggleMobileAudioBar() {
     const container = document.getElementById('audioBarContainer');
     const arrow = document.getElementById('mobileAudioBarArrow');
     
-    // إذا كانت مغلقة ومختفية فوق، ننزّلها
+    // تبديل الكلاس المسؤول عن الإخفاء والظهور تلقائياً
+    container.classList.toggle('-translate-y-full');
+    
+    // تغيير اتجاه السهم بناءً على حالة القائمة
     if (container.classList.contains('-translate-y-full')) {
-        container.classList.remove('-translate-y-full');
-        container.classList.add('translate-y-0');
-        arrow.classList.replace('fa-chevron-down', 'fa-chevron-up');
-    } 
-    // إذا كانت مفتوحة، نرفعها لفوق بالملي بحيث يبقى السهم باين
-    else {
-        container.classList.remove('translate-y-0');
-        container.classList.add('-translate-y-full');
         arrow.classList.replace('fa-chevron-up', 'fa-chevron-down');
+    } else {
+        arrow.classList.replace('fa-chevron-down', 'fa-chevron-up');
     }
 }
