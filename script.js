@@ -50,25 +50,7 @@ window.onload = function() {
 
 // 2. TIMERS & DIGITAL CLOCK SYSTEM (السعودية)
 function initClock() {
-    setInterval(() => {
-        const now = new Date();
-        
-        // الوقت بتوقيت السعودية ونظام 12 ساعة (ص/م)
-        const optionsTime = { timeZone: 'Asia/Riyadh', hour: 'numeric', minute: '2-digit', second: '2-digit', hour12: true };
-        document.getElementById('digitalClock').innerText = now.toLocaleTimeString('ar-SA', optionsTime);
-        
-        // التاريخ الميلادي بتوقيت السعودية
-        const optionsGregorian = { timeZone: 'Asia/Riyadh', weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        document.getElementById('currentGregorianDisplay').innerText = now.toLocaleDateString('ar-SA', optionsGregorian);
-        
-        // التاريخ الهجري
-        const optionsHijri = { year: 'numeric', month: 'long', day: 'numeric' };
-        const hijriDate = new Intl.DateTimeFormat('ar-SA-u-ca-islamic', optionsHijri).format(now);
-        
-        if(!document.getElementById('currentHijriDisplay').dataset.apiUpdated) {
-            document.getElementById('currentHijriDisplay').innerText = hijriDate;
-        }
-    }, 1000);
+    // تم إيقاف هذه الدالة لأننا نقلنا الساعة للواجهة الرئيسية الجديدة
 }
 
 // 3. CORE TABS SWITCH LOGIC (يدعم الجوال والكمبيوتر)
