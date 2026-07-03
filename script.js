@@ -393,7 +393,7 @@ function fetchPrayerTimesAPI() {
         .then(payload => {
             const timings = payload.data.timings; const dates = payload.data.date;
             
-            // إضافة الأوقات بعد تحويلها عن طريق الدالة الجديدة
+            // إضافة الأوقات بعد تحويلها لـ 12 ساعة
             document.getElementById('time-Fajr').innerText = formatTime12Hour(timings.Fajr);
             document.getElementById('time-Sunrise').innerText = formatTime12Hour(timings.Sunrise);
             document.getElementById('time-Dhuhr').innerText = formatTime12Hour(timings.Dhuhr);
@@ -404,15 +404,6 @@ function fetchPrayerTimesAPI() {
             const hijriDisplay = document.getElementById('currentHijriDisplay');
             hijriDisplay.innerText = `${dates.hijri.day} ${dates.hijri.month.ar} ${dates.hijri.year} هـ`;
             hijriDisplay.dataset.apiUpdated = "true";
-            
-            appState.qiblaAngle = payload.data.meta.qibla || 21.4;
-            
-            // تحقق من وجود عناصر البوصلة قبل تحديثها (لأننا حذفناها سابقاً)
-            const qiblaAngleElement = document.getElementById('quranQiblaAngle');
-            const compassDiscElement = document.getElementById('compassDisc');
-            
-            if (qiblaAngleElement) qiblaAngleElement.innerText = Math.round(appState.qiblaAngle);
-            if (compassDiscElement) compassDiscElement.style.transform = `rotate(${-appState.qiblaAngle}deg)`;
             
             document.getElementById('nextPrayerCountdown').innerText = "تم عرض مواقيت الصلاة للموقع المحدد بنجاح";
         });
