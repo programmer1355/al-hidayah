@@ -452,3 +452,19 @@
 </script>
 </body>
 </html>
+
+<!-- حاوية القراءة المتكاملة -->
+<div id="view-quranRead" class="hidden reading-mode">
+    <div id="quran-content" class="text-center">
+        <!-- هنا سيتم حقن الآيات عن طريق JavaScript -->
+        <h2 class="text-3xl font-bold mb-8">سورة الفاتحة</h2>
+        <p class="ayah-text text-xl">بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ (1) الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ (2)...</p>
+    </div>
+    
+    <!-- أدوات التحكم السفلية (مثل تطبيق آية) -->
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-white shadow-t flex justify-center gap-6">
+        <button onclick="toggleFocusMode()" class="p-2 bg-emerald-600 text-white rounded-full">
+            خروج من وضع القراءة
+        </button>
+    </div>
+</div>
