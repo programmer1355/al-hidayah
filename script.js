@@ -611,8 +611,6 @@ function setMainHijriDate() {
 setMainHijriDate();
 // --- نظام تطبيق آية المتكامل ---
 
-let isAyahFocusMode = false;
-
 function toggleAyahControls() {
     isAyahFocusMode = !isAyahFocusMode;
     const bottomNav = document.querySelector('.lg\\:hidden.fixed.bottom-0');
