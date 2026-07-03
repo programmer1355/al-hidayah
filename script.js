@@ -502,3 +502,22 @@ function toggleMakkahModal(status) {
 }
 function stopMakkahStream() { document.getElementById('makkahIframe').src = ""; toggleMakkahModal(false); alert('تم إيقاف البث.'); }
 document.getElementById('dashboardModeBtn').addEventListener('click', () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(err => {}); else document.exitFullscreen(); }); 
+
+// دالة فتح وإغلاق مشغل الصوت في الجوال (انزلاق ناعم من الأعلى)
+function toggleMobileAudioBar() {
+    const container = document.getElementById('audioBarContainer');
+    const arrow = document.getElementById('mobileAudioBarArrow');
+    
+    // إذا كان المشغل مخفي بالأعلى (نفتحه وننزله)
+    if (container.classList.contains('-translate-y-[120%]')) {
+        container.classList.remove('-translate-y-[120%]');
+        container.classList.add('translate-y-0');
+        arrow.classList.replace('fa-chevron-down', 'fa-chevron-up');
+    } 
+    // إذا كان المشغل مفتوح (نرفعه ونخفيه)
+    else {
+        container.classList.remove('translate-y-0');
+        container.classList.add('-translate-y-[120%]');
+        arrow.classList.replace('fa-chevron-up', 'fa-chevron-down');
+    }
+}
