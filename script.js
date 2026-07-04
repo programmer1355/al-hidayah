@@ -31,8 +31,6 @@ let currentSurahAyahsData = [];
 
 window.onload = function() {
     initClock();
-    loadSurahListSelectors();
-    loadSurahContent();
     renderAthkarCategories();
     requestLocationAccess();
     loadLocalStorageState();
@@ -44,10 +42,6 @@ window.onload = function() {
         audioPlayer.src = e.target.value;
         audioPlayer.play().catch(() => {});
     });
-    
-    document.getElementById('quranDedicatedAudio').addEventListener('ended', handleQuranAudioEnded);
-};
-
 // 2. TIMERS & DIGITAL CLOCK SYSTEM (السعودية)
 function initClock() {
     // تم إيقاف هذه الدالة لأننا نقلنا الساعة للواجهة الرئيسية الجديدة
